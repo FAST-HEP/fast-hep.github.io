@@ -10,70 +10,15 @@ Not all of these packages exist at the moment, for details check the status belo
 
 ### fasthep
 
-| Description | **Metapackage for all FAST-HEP packages for easier installation** |
-| --- | --- |
-| Installation | `pip install fasthep[full\|core\|dev]` |
-| Status | Ready for testing |
-
-### fasthep-cli
-
-| Description | **Unified Command Line Interface for all FAST-HEP packages** |
-| --- | --- |
-| Installation | ``pip install fasthep-cli`` |
-| Status | Ready for testing |
-
-### fasthep-logging
-
-| Description | **Logging package - provides "trace" and "timing" log-levels** |
-| --- | --- |
-| Installation | ``pip install fasthep-logging`` |
-| Status | Completed |
-
-### fasthep-gitlab
-
-| Description | **Refactor of gitlab components from scikit-validate** |
-| --- | --- |
-| Installation | `pip install fasthep-gitlab` |
-| Status | None |
-
-### fasthep-carpenter
-
-| Description | **Rewrite of fast-carpenter.** |
-| --- | --- |
-| Installation | `pip install fasthep-carpenter` |
-| Status | In Development |
-
-### fasthep-curator
-
-| Description | **Clone of fast-curator.** |
-| --- | --- |
-| Installation | `pip install fasthep-curator` |
-| Status | None |
-
-### fasthep-flow
-
-| Description | **Clone of fast-flow.** |
-| --- | --- |
-| Installation | `pip install fasthep-flow` |
-| Status | None |
-
-### fasthep-plotter
-
-| Description | **Rewrite of fast-plotter** |
-| --- | --- |
-| Installation | `pip install fasthep-plotter` |
-| Status | None |
-
-### fasthep-validate
-
-| Description | **Rewrite of scikit-validate** |
-| --- | --- |
-| Installation | `pip install fasthep-plotter` |
-| Status | None |
-
-### fasthep-stats
-
-| Description | **Rewrite of fast-datacard??** |
-| --- | --- |
-| Installation | `pip install fasthep-stats` |
-| Status | None |
+| Package | Description | Installation | Status |
+| --- | --- |--- |--- |
+| **fasthep** | Metapackage for all FAST-HEP packages for easier installation | `pip install fasthep[full\|core\|dev]` | :yellow_circle: Ready for testing |
+| **fasthep-cli** |  Unified Command Line Interface for all FAST-HEP packages | ``pip install fasthep-cli`` | :yellow_circle: Ready for testing |
+| **fasthep-logging** | Logging package - provides "trace" and "timing" log-levels | ``pip install fasthep-logging`` |:green_circle: Completed |
+| **fasthep-gitlab** | Refactor of gitlab components from scikit-validate | `pip install fasthep-gitlab` | :red_circle: None |
+| **fasthep-carpenter** | Rewrite of fast-carpenter | `pip install fasthep-carpenter` | :orange_circle: In Development |
+| **fasthep-curator** | Clone of fast-curator. | `pip install fasthep-curator` | :red_circle: None |
+| **fasthep-flow** | Clone of fast-flow. | `pip install fasthep-flow` | :red_circle: None |
+| **fasthep-plotter** | Rewrite of fast-plotter |`pip install fasthep-plotter` | :red_circle: None |
+| **fasthep-validate** | Rewrite of scikit-validate | `pip install fasthep-plotter` | :red_circle: None |
+| **fasthep-stats** |Rewrite of fast-datacard?? | `pip install fasthep-stats` | :red_circle: None |
