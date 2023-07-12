@@ -1,7 +1,7 @@
 baseURL = 'http://fasthep.github.io/'
 languageCode = 'en-us'
 title = 'FAST-HEP'
-
+enableEmoji = true
 theme = "hugo-geekdoc"
 
 pluralizeListTitles = false
