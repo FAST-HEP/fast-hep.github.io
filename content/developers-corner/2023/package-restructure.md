@@ -18,7 +18,7 @@ Not all of these packages exist at the moment, for details check the status belo
 | **fasthep-gitlab** | Refactor of gitlab components from scikit-validate | `pip install fasthep-gitlab` | :red_circle: None |
 | **fasthep-carpenter** | Rewrite of fast-carpenter | `pip install fasthep-carpenter` | :orange_circle: In Development |
 | **fasthep-curator** | Clone of fast-curator. | `pip install fasthep-curator` | :red_circle: None |
-| **fasthep-flow** | Clone of fast-flow. | `pip install fasthep-flow` | :red_circle: None |
+| **fasthep-flow** | Clone of fast-flow. | `pip install fasthep-flow` | :orange_circle: In Development |
 | **fasthep-plotter** | Rewrite of fast-plotter |`pip install fasthep-plotter` | :red_circle: None |
 | **fasthep-validate** | Rewrite of scikit-validate | `pip install fasthep-validate` | :red_circle: None |
 | **fasthep-stats** |Rewrite of fast-datacard?? | `pip install fasthep-stats` | :red_circle: None |
