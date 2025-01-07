@@ -5,7 +5,7 @@ Our current and past efforts have this always in mind as we want to generate pat
 This section is displaying current development efforts and their goals - an [archive]({{< ref "archive" >}}) of older efforts will be put up.
 
 
-## Current development (2023)
+## Current development
 
 FAST-HEP is currently undergoing a major rewrite of most packages.
 
