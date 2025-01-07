@@ -1,5 +1,3 @@
 +++
-hidden = true
-unlisted = true
-draft = true
+geekdocHidden = true
 +++
