@@ -1,2 +1,2 @@
 
-[![Under construction](/images/under_construction.avif)](/images/under_construction.avif)
+[![FAST-HEP analysis structure (old)](/images/analysis_structure.png)](/images/analysis_structure.png)
