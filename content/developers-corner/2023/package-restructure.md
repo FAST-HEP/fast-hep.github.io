@@ -1,5 +1,5 @@
 +++
-weight = 1
+geekdocHidden = true
 +++
 
 [![FAST-HEP package restructure](/images/package_restructure.png)](/images/package_restructure.png)

@@ -1,5 +1,6 @@
 +++
 weight = 2
+geekdocHidden = true
 +++
 
 [![workflow example](/images/local-workflow.png)](/images/local-workflow.png)
