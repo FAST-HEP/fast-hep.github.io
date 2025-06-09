@@ -12,6 +12,7 @@ To ensure production workflows remain stable and uninterrupted—while also impr
   - **`fasthep-cli`**: A unified command-line interface replacing the individual CLIs in existing `fast-*` packages.
   - **`fasthep-workshop`**: A curated set of Jupyter notebooks demonstrating real-world usage in a workshop-style format.
   - **`fasthep`**: A meta-package simplifying installation of the entire FAST-HEP stack — or subsets of it.
+  - **`fasthep-toolbench`**: A package containing utility functions that are useful across multiple packages, such as file handling, logging, and other common tasks.
 
 An overview of the planned packages is shown below:
 ```mermaid
@@ -21,7 +22,7 @@ flowchart TB
     subgraph Utility["`**Utility**`"]
         cli("fasthep-cli")
         workshop("fasthep-workshop")
-        gitlab("fasthep-gitlab (TBC)")
+        toolbench("fasthep-toolbench")
     end
 
     subgraph Core["`**Core**`"]
@@ -35,6 +36,7 @@ flowchart TB
 
         plotter("fasthep-plotter")
         validate("fasthep-validate")
+        report("fasthep-report")
         stats("fasthep-stats (TBC)")
     end
 
@@ -43,7 +45,7 @@ flowchart TB
     style Utility fill:#d2e2f2,stroke:#333,stroke-width:2px,color:#4da6ff,font-size:12pt;
     style cli fill:#4da6ff,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
     style workshop fill:#4da6ff,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
-    style gitlab fill:#4da6ff,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
+    style toolbench fill:#4da6ff,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
 
     style Core fill:#fdf2cf,stroke:#333,stroke-width:2px,color:#f49c2f,font-size:12pt;
     style carpenter fill:#f49c2f,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
@@ -54,7 +56,7 @@ flowchart TB
     style plotter fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
     style validate fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
     style stats fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
-
+    style report fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
 
     fasthep --> Utility
     fasthep --> Core
