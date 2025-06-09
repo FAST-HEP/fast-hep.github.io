@@ -16,6 +16,14 @@ The [packages]({{< ref "packages" >}}) are available on [pypi](https://pypi.org/
   pip install fasthep[full]
 ```
 
+## Goals
+> **Note:**  "At the end of the day, when you're making something, the hardest part to understand [...] is how data are originated, how they are manipulated, and how they are displayed." - The Primeagen, probably.
+
+FAST-HEP aims to provide tools that help HEP researchers to describe:
+- where data come from (fasthep-curator)
+- how data are manipulated (fasthep-flow + fasthep-carpenter)
+- how data are displayed (fasthep-flow + fasthep-plotter)
+
 ## Who is using it
 FAST-HEP is currently used by members of: the [CMS Collaboration](https://cms.cern) (including analysis and upgrade work), the [LZ Dark Matter Experiment](https://lz.lbl.gov/), and the [Deep Underground Neutrino Experiment](https://www.dunescience.org/) (DUNE).
 Collaborations or individuals that are interested in our tools or need support can reach us at [fast-hep@cern.ch](mailto:fast-hep@cern.ch). We also have a community on gitter: https://gitter.im/FAST-HEP/community.
