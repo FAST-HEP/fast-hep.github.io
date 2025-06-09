@@ -2,7 +2,7 @@
 geekdocHidden = true
 +++
 
-[![FAST-HEP package restructure](/images/package_restructure.png)](/images/package_restructure.png)
+[![FAST-HEP package restructure](/images/package_restructure_2023.png)](/images/package_restructure_2023.png)
 
 For the "Extensions" the plan is to rewrite these packages as stages/plugins to the `carpenter` package.
 
