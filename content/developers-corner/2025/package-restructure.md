@@ -20,6 +20,7 @@ flowchart TB
     
     fasthep("fasthep")
     subgraph Utility["`**Utility**`"]
+
         cli("fasthep-cli")
         workshop("fasthep-workshop")
         toolbench("fasthep-toolbench")
@@ -56,11 +57,23 @@ flowchart TB
     style plotter fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
     style validate fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
     style stats fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
-    style report fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt;
+    style report fill:#73a557,stroke:#333,stroke-width:2px,color:white,font-size:16pt, a.text-decoration: none;
 
     fasthep --> Utility
     fasthep --> Core
     fasthep --> Extensions
+
+    click fasthep "https://github.com/FAST-HEP/fasthep" _blank
+    click cli "https://github.com/FAST-HEP/fasthep-cli" _blank
+    click workshop "https://github.com/FAST-HEP/fasthep-workshop" _blank
+    click toolbench "https://github.com/FAST-HEP/fasthep-toolbench" _blank
+    click carpenter "https://github.com/FAST-HEP/fasthep-carpenter" _blank
+    click curator "https://github.com/FAST-HEP/fasthep-curator" _blank
+    click flow "https://github.com/FAST-HEP/fasthep-flow" _blank
+    click plotter "https://github.com/FAST-HEP/fasthep-plotter" _blank
+    click validate "https://github.com/FAST-HEP/fasthep-validate" _blank
+    click stats "https://github.com/FAST-HEP/fasthep-stats" _blank
+    click report "https://github.com/FAST-HEP/fasthep-report" _blank
 ```
 
 

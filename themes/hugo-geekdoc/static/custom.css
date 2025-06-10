@@ -1,1 +1,4 @@
 /* You can add custom styles here. */
+a.node text {
+    text-decoration: none;
+}
