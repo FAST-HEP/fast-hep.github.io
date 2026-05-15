@@ -15,6 +15,8 @@ disablePathToLower = true
 # Required if you want to render robots.txt template
 enableRobotsTXT = true
 
+disableKinds = ["taxonomy"]
+
 # Needed for mermaid shortcodes
 [markup]
   [markup.goldmark.renderer]
@@ -26,3 +28,89 @@ enableRobotsTXT = true
 
 [taxonomies]
    tag = "tags"
+
+[params]
+[params.author]
+name = "FAST-HEP"
+
+[[params.navbar]]
+title = "Getting started"
+url = "/getting-started/"
+
+[[params.navbar]]
+title = "Concepts"
+url = "/concepts/"
+
+[[params.navbar]]
+title = "Packages"
+url = "/packages/"
+
+[[params.navbar]]
+title = "Tutorials"
+url = "/tutorials/"
+
+[[params.navbar]]
+title = "Talks"
+url = "/talks/"
+
+[[params.navbar]]
+title = "Contributing"
+
+[params.footer]
+logo = "logo.svg"
+socialmediatitle = "FAST-HEP"
+
+[[params.footer.socialmedia]]
+link = "https://github.com/FAST-HEP"
+icon = "github"
+
+[[params.footer.socialmedia]]
+link = "https://github.com/FAST-HEP/fasthep/discussions"
+icon = "discourse"
+
+[params.footer.quicklinks]
+
+  [params.footer.quicklinks.column1]
+  title = "Project"
+
+  [[params.footer.quicklinks.column1.links]]
+  text = "GitHub organisation"
+  link = "https://github.com/FAST-HEP"
+
+  [[params.footer.quicklinks.column1.links]]
+  text = "fasthep meta package"
+  link = "https://github.com/FAST-HEP/fasthep"
+
+  [[params.footer.quicklinks.column1.links]]
+  text = "Discussions"
+  link = "https://github.com/FAST-HEP/fasthep/discussions"
+
+  [params.footer.quicklinks.column2]
+  title = "Documentation"
+
+  [[params.footer.quicklinks.column2.links]]
+  text = "Workflow concepts"
+  link = "/concepts/"
+
+  [[params.footer.quicklinks.column2.links]]
+  text = "Packages"
+  link = "/packages/"
+
+  [[params.footer.quicklinks.column2.links]]
+  text = "Tutorials"
+  link = "/tutorials/"
+
+  [params.footer.quicklinks.column3]
+  title = "Packages"
+
+  [[params.footer.quicklinks.column3.links]]
+  text = "fasthep-flow"
+  link = "https://github.com/FAST-HEP/fasthep-flow"
+
+  [[params.footer.quicklinks.column3.links]]
+  text = "fasthep-carpenter"
+  link = "https://github.com/FAST-HEP/fasthep-carpenter"
+
+  [[params.footer.quicklinks.column3.links]]
+  text = "fasthep-curator"
+  link = "https://github.com/FAST-HEP/fasthep-curator"
