@@ -2,8 +2,6 @@
 title: "FAST-HEP"
 ---
 
-# FAST-HEP
-
 FAST-HEP is an ecosystem of modular tools for declarative High Energy Physics (HEP) workflows, analysis, rendering, metadata management, and reproducible scientific computing.
 
 The project focuses on separating:

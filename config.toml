@@ -30,6 +30,13 @@ disableKinds = ["taxonomy"]
    tag = "tags"
 
 [params]
+images = ["/images/fast-hep-black.png", "/images/fast-hep-white.png", "/images/fast-hep-black-squareBkg.png"]
+
+[params.navbarlogo]
+image = "fast-hep-black.png"
+# text = "FAST-HEP"
+link = "/"
+
 [params.author]
 name = "FAST-HEP"
 
@@ -57,7 +64,7 @@ url = "/talks/"
 title = "Contributing"
 
 [params.footer]
-logo = "logo.svg"
+logo = "fast-hep-black-squareBkg.png"
 socialmediatitle = "FAST-HEP"
 
 [[params.footer.socialmedia]]
