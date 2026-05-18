@@ -19,6 +19,7 @@ disableKinds = ["taxonomy"]
 
 # Needed for mermaid shortcodes
 [markup]
+  defaultMarkdownHandler = 'goldmark'
   [markup.goldmark.renderer]
     # Needed for mermaid shortcode
     unsafe = true
@@ -31,6 +32,8 @@ disableKinds = ["taxonomy"]
 
 [params]
 images = ["/images/fast-hep-black.png", "/images/fast-hep-white.png", "/images/fast-hep-black-squareBkg.png"]
+custom_css = ["css/custom.css"]
+sidebar = true
 
 [params.navbarlogo]
 image = "fast-hep-black.png"
