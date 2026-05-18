@@ -94,9 +94,9 @@ Possible use cases include:
 
 Strategies are still under active design and should currently be considered work in progress.
 
-:::{note}
+{{< admonition note >}}
 Strategies are intended to customise execution behavior rather than redefine workflow semantics. The analysis workflow should remain portable across backends where practical.
-:::
+{{< /admonition >}}
 
 ---
 

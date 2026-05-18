@@ -58,9 +58,9 @@ Operations may perform many different tasks.
 
 The exact boundary between categories may evolve as the ecosystem matures, but the core separation of responsibilities between packages is intentional.
 
-{{% note %}}
+{{< admonition note >}}
 Rendering is currently registered as a sink because it consumes produced artifacts and writes visual outputs. It may become a more explicit operation category as the rendering API stabilises.
-{{% /note %}}
+{{< /admonition >}}
 
 ---
 
