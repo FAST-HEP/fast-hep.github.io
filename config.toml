@@ -31,7 +31,12 @@ disableKinds = ["taxonomy"]
    tag = "tags"
 
 [params]
-images = ["/images/fast-hep-black.png", "/images/fast-hep-white.png", "/images/fast-hep-black-squareBkg.png"]
+images = [
+  "/images/fast-hep-black.png",
+  "/images/fast-hep-white.png",
+  "/images/fast-hep-black-squareBkg.png",
+  "/images/favicon.ico",
+]
 custom_css = ["css/custom.css"]
 sidebar = true
 
