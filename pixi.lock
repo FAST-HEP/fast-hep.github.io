@@ -10,14 +10,17 @@ environments:
     packages:
       linux-64:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/_openmp_mutex-4.5-20_gnu.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dart-sass-1.101.3-hfc2019e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/hugo-0.164.0-hc83c272_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libgcc-15.2.0-he0feb66_19.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libgomp-15.2.0-he0feb66_19.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libstdcxx-15.2.0-h934c35e_19.conda
       osx-64:
+      - conda: https://conda.anaconda.org/conda-forge/osx-64/dart-sass-1.101.3-h8822bef_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/hugo-0.164.0-h0938e48_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-64/libcxx-22.1.8-h19cb2f5_0.conda
       osx-arm64:
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/dart-sass-1.101.3-h820172f_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/hugo-0.164.0-ha4d9615_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/libcxx-22.1.8-h55c6f16_0.conda
 packages:
@@ -37,6 +40,14 @@ packages:
     - _openmp_mutex >=4.5
   size: 28948
   timestamp: 1770939786096
+- conda: https://conda.anaconda.org/conda-forge/linux-64/dart-sass-1.101.3-hfc2019e_0.conda
+  sha256: 69536500f63f975797c5d5783e39c44a10d6df18a618e439794025607bfef5c6
+  md5: 25aa9feec8bc49793e99f2309b0498c9
+  license: MIT
+  license_family: MIT
+  run_exports: {}
+  size: 4102233
+  timestamp: 1784613983631
 - conda: https://conda.anaconda.org/conda-forge/linux-64/hugo-0.164.0-hc83c272_0.conda
   sha256: 3c6c4a6e11e726a62a4c714d3280d455e80e76f2417fa3875c24ce718a2aff30
   md5: f2046a91afc72270485d553ccdd10c3a
@@ -89,6 +100,14 @@ packages:
   run_exports: {}
   size: 5852044
   timestamp: 1778269036376
+- conda: https://conda.anaconda.org/conda-forge/osx-64/dart-sass-1.101.3-h8822bef_0.conda
+  sha256: e3da7b731922b61f494ba2d74b3aa05587ea234d96758f9e63fa37a384f370ed
+  md5: 5517d1f3cb90262b5f1b0ea243cc5391
+  license: MIT
+  license_family: MIT
+  run_exports: {}
+  size: 3965373
+  timestamp: 1784614030450
 - conda: https://conda.anaconda.org/conda-forge/osx-64/hugo-0.164.0-h0938e48_0.conda
   sha256: a31720ba10988efa337f4bb6d88f68815a17c7549bb69e3279f13d4a5a9828ec
   md5: c7ecd42ed449c36a576ee839d905f2da
@@ -112,6 +131,14 @@ packages:
   run_exports: {}
   size: 566717
   timestamp: 1781672189697
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/dart-sass-1.101.3-h820172f_0.conda
+  sha256: fe3c652bd917df379887a6dcd4433e7d59da1f666350ec681f37335ae79c9f89
+  md5: 3e77cec4663f3011fc510d44b0be0967
+  license: MIT
+  license_family: MIT
+  run_exports: {}
+  size: 3764220
+  timestamp: 1784613997813
 - conda: https://conda.anaconda.org/conda-forge/osx-arm64/hugo-0.164.0-ha4d9615_0.conda
   sha256: aab0f97f766a8d80b5d31ed1c123905874dfae88b8b242980dab277d577a1db9
   md5: c66298dc742f3a1d50767e09d0c3a530
