@@ -8,5 +8,5 @@ hugo = "==0.164.0"
 dart-sass = "==1.101.3"
 
 [tasks]
-serve = "hugo server --buildDrafts"
+serve = "hugo server --buildDrafts --noHTTPCache --poll 500ms"
 build = "hugo --minify"
