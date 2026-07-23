@@ -1,25 +1,43 @@
 ---
+
 title: "Analysis repositories"
 weight: 6
 ---
 
-FAST-HEP encourages analyses to be structured as installable Python packages rather than collections of standalone scripts.
+# Analysis repositories
 
-This approach improves:
+FAST-HEP encourages analyses to be structured as installable Python packages.
 
-- reproducibility
-- dependency management
-- workflow portability
-- reuse of custom transforms and hooks
-- integration with FAST-HEP tooling
+This provides a natural place for:
 
-The recommended structure is intentionally similar to modern Python packaging practices.
+* workflow descriptions
+* analysis-specific operations
+* profiles and registries
+* configuration
+* tests
+* documentation
+
+and makes analysis code identifiable as a versioned software component.
+
+```mermaid
+flowchart LR
+    Analysis["analysis repository"]
+    Package["installable<br/>Python package"]
+    Profile["analysis profile"]
+    Workflow["FAST-HEP workflow"]
+
+    Analysis --> Package
+    Package --> Profile
+    Profile --> Workflow
+```
+
+This is particularly important for reproducibility: analysis-specific code is part of the software environment that produced a scientific result.
 
 ---
 
 ## Recommended structure
 
-A typical analysis repository may look like:
+A FAST-HEP analysis might use a structure such as:
 
 ```text
 my-analysis/
@@ -30,217 +48,124 @@ my-analysis/
 │   └── my_analysis/
 │       ├── profiles/
 │       │   └── registry.yaml
-│       ├── transforms/
-│       ├── hooks/
-│       ├── sinks/
-│       ├── sources/
+│       ├── operations/
 │       └── __init__.py
-├── tests/
-└── data/
+└── tests/
 ```
 
-This structure allows the analysis to behave like a normal Python package while also exposing FAST-HEP workflow extensions.
+The exact structure is not prescribed. An analysis only needs the components relevant to it.
+
+The important recommendation is that analysis-specific Python code lives in an **installable package** rather than relying on scripts or directories added manually to `PYTHONPATH`.
+
+The package can be installed normally with tools such as `pip` or `pixi`, including as an editable installation during development.
 
 ---
 
-## Why package analyses?
+## Analysis-specific capabilities
 
-Historically, many HEP analyses evolved as collections of scripts and notebooks.
+Many analyses need functionality beyond the operations provided by the standard FAST-HEP toolkit.
 
-FAST-HEP instead encourages analyses to expose:
+For example, an analysis may provide:
 
-- reusable transforms
-- custom workflow operations
-- experiment-specific sources
-- rendering extensions
-- diagnostics hooks
+* experiment-specific calculations
+* specialised object definitions or selections
+* custom data readers
+* alternative implementations of existing operations
+* specialised output handling
+* additional diagnostics
 
-through standard Python packaging.
+These capabilities can use the same registry and profile mechanisms as the rest of FAST-HEP.
 
-This makes analyses easier to:
+```mermaid
+flowchart TD
+    HEP["hep profile"]
+    Experiment["experiment profile"]
+    Analysis["analysis profile"]
 
-- share
-- validate
-- test
-- version
-- distribute
+    HEP --> Experiment --> Analysis
+```
+
+An analysis can therefore extend an existing environment rather than modifying Flow or the FAST-HEP packages that it depends on.
+
+See [Profiles and registries]({{< ref "profiles-and-registries.md" >}}) for how these environments are composed.
 
 ---
 
-## Registries and profiles
+## Why installable packages?
 
-Analysis repositories typically expose a registry profile:
+Python allows code to be made importable simply by manipulating `PYTHONPATH`. This is common in existing analysis environments, but provides little information about where that code came from or which version was used.
+
+Installing analysis code as a package gives it a clearer identity within the software environment.
+
+This makes it easier to:
+
+* declare and reproduce dependencies
+* identify analysis-specific software
+* record package versions
+* test code independently
+* use standard Python development tooling
+* share the analysis with collaborators
+
+For FAST-HEP, this also supports provenance.
+
+As workflow capabilities are resolved, FAST-HEP can associate implementations with the packages that provided them. Recording those package identities and versions can then help reconstruct the software environment used for a particular execution.
+
+Support for collecting this information automatically as part of FAST-HEP provenance is under development.
+
+---
+
+## Reproducibility
+
+A reproducible analysis requires more than preserving its `author.yaml`.
+
+The workflow may refer to operations provided by:
 
 ```text
-src/my_analysis/profiles/registry.yaml
+FAST-HEP packages
+        +
+experiment packages
+        +
+analysis package
 ```
 
-which can then be activated in workflows:
+Together, these form part of the executable scientific environment.
 
-```yaml
-use:
-  profiles:
-    - my_analysis:registry
-```
+Packaging analysis-specific code makes those dependencies explicit and gives provenance tooling something concrete to identify and record.
 
-This allows analyses to register:
-
-- custom transforms
-- hooks
-- sinks
-- sources
-- rendering behavior
-
-without modifying FAST-HEP core packages.
-
-For more detail, see:
-
-- [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
+This complements the FAST-HEP architecture described in the preceding concept pages: implementations are deliberately replaceable, so reproducibility requires knowing **which implementations were actually used**.
 
 ---
 
-## Transforms
+## Testing and development
 
-Transforms contain reusable analysis logic.
+Treating an analysis as a software package also makes conventional software-engineering practices easier to adopt.
 
-Typical examples include:
+Analysis repositories can include:
 
-- object definitions
-- selections
-- derived variables
-- matching algorithms
-- experiment-specific calculations
+* unit tests for analysis-specific operations
+* workflow smoke tests
+* regression tests for scientific outputs
+* integration tests
+* documentation and examples
 
-Example structure:
-
-```text
-transforms/
-├── muons.py
-├── jets.py
-└── selections.py
-```
-
-Transforms are generally registered through the analysis registry.
+None of these require special FAST-HEP mechanisms; standard Python tooling can be used alongside the workflow.
 
 ---
 
-## Sources
+## Examples and guidance
 
-Sources introduce data into workflows.
+The [`fasthep-workshop`](https://github.com/FAST-HEP/fasthep-workshop) repository contains runnable analyses and examples of FAST-HEP project organisation.
 
-Analysis repositories may provide:
+The recommended repository structure will continue to evolve as FAST-HEP tooling and provenance support mature.
 
-- experiment-specific readers
-- toy/example datasets
-- cached intermediate formats
-- derived datasets
-
-Example:
-
-```text
-sources/
-└── toy_source.py
-```
-
----
-
-## Hooks
-
-Hooks allow analyses to react to runtime lifecycle events.
-
-Common use cases include:
-
-- diagnostics
-- metadata collection
-- summaries
-- monitoring
-- experiment-specific bookkeeping
-
-Hooks intentionally remain separate from core analysis transforms.
-
----
-
-## Sinks
-
-Sinks consume produced artifacts and persist outputs.
-
-Examples include:
-
-- custom ROOT writers
-- parquet exporters
-- summary generators
-- experiment-specific output formats
-
-Rendering integrations are currently also implemented through sink-style interfaces.
-
----
-
-## Testing
-
-Analysis repositories are encouraged to include automated tests.
-
-Typical testing layers include:
-
-- unit tests for transforms
-- workflow smoke tests
-- rendering regression tests
-- integration tests
-
-FAST-HEP development tooling is designed to support cross-package integration testing through the `fasthep-dev` workspace.
-
----
-
-## Workshop examples
-
-The `fasthep-workshop` repository serves as a reference implementation of the recommended analysis structure.
-
-It contains:
-
-- tutorials
-- example workflows
-- custom sources
-- example registries
-- development patterns
-
-The workshop repository is intended to evolve alongside the FAST-HEP ecosystem and demonstrate recommended practices.
-
----
-
-## Future directions
-
-Planned tooling may eventually include:
-
-- `fasthep init`
-- analysis templates
-- registry scaffolding
-- example generation
-- backend configuration helpers
-
-The goal is to make it easier to create portable and reproducible analysis repositories with minimal boilerplate.
-
----
-
-## Design philosophy
-
-FAST-HEP encourages analyses to behave like modular software projects rather than isolated execution scripts.
-
-This helps support:
-
-- long-term maintainability
-- collaboration
-- testing
-- workflow reuse
-- ecosystem interoperability
-
-while still allowing experiment-specific customisation where needed.
+The aim is not to impose a rigid directory layout, but to make analysis-specific software **installable, identifiable, testable, and reproducible**.
 
 ---
 
 ## Related concepts
 
-- [Workflow language]({{< ref "workflow-language.md" >}})
-- [Workflow compilation pipeline]({{< ref "author-normalise-plan.md" >}})
-- [Operations and specs]({{< ref "operations-and-specs.md" >}})
-- [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
-- [Execution backends]({{< ref "execution-backends.md" >}})
-
+* [Workflow language]({{< ref "workflow-language.md" >}})
+* [Compilation and execution]({{< ref "compilation-and-execution.md" >}})
+* [Operations and specs]({{< ref "operations-and-specs.md" >}})
+* [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
+* [Execution environments]({{< ref "execution-environments.md" >}})

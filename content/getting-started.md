@@ -1,125 +1,175 @@
 ---
+
 title: "Getting started"
 ---
 
-FAST-HEP is distributed as a collection of modular packages.
+This guide walks through a small FAST-HEP analysis using CMS Open Data.
 
-The recommended entry point is the `fasthep` meta package, which provides curated installation profiles for different use cases.
+FAST-HEP analyses are described declaratively: you describe **what** you want to compute, while FAST-HEP determines how the corresponding workflow should be constructed and executed.
+
+By the end of this guide, you will have:
+
+* set up a reproducible FAST-HEP environment
+* run a dimuon analysis using CMS Open Data
+* produced a Data/MC comparison of the dimuon invariant mass
+* seen how the analysis is described in `author.yaml`
 
 {{< admonition warning >}}
-The FAST-HEP ecosystem is currently undergoing a major rewrite and alpha-stage reorganisation.
+FAST-HEP is currently undergoing a major rewrite and is in alpha development.
 
-Not all packages are available on PyPI yet, and some installation details may change while the ecosystem stabilises.
-
-We will try to keep the main installation entry points stable for their intended use cases.
+Interfaces and installation details may change while the toolkit stabilises.
 {{< /admonition >}}
 
 ---
 
-## HEP installation
+## Get the example
 
-Recommended for most HEP users.
+The quickest way to try FAST-HEP is through the runnable examples in the workshop repository.
 
-Includes:
-
-- workflow execution
-- ROOT and awkward support
-- histogramming
-- rendering
-- diagnostics
-- CLI tooling
+Clone the repository:
 
 ```bash
-pip install "fasthep[hep]"
+git clone https://github.com/FAST-HEP/fasthep-workshop.git
+cd fasthep-workshop
 ```
 
-This is expected to become the standard installation profile for typical HEP analyses.
+The workshop uses [Pixi](https://pixi.sh/) to provide a reproducible environment containing the required FAST-HEP packages and dependencies.
 
----
-
-## Full installation
-
-Installs the complete FAST-HEP ecosystem and optional tooling.
+Set up the environment with:
 
 ```bash
-pip install "fasthep[full]"
+pixi install
 ```
 
-This profile is mainly intended for:
-
-- developers
-- integration testing
-- ecosystem experimentation
+{{< admonition note >}}
+If you want to install FAST-HEP into an existing Python environment instead, see the [installation guide](/#installation).
+{{< /admonition >}}
 
 ---
 
-## Minimal installation
+## The dimuon example
 
-Installs only the core workflow tooling.
+We will use the CMS Open Data dimuon example:
+
+```text
+examples/CMS/Zmumu/
+├── author.yaml
+└── remote_data.json
+```
+
+The analysis compares CMS collision data with simulated Standard Model processes around the Z boson resonance.
+
+It reads muon information from ROOT files, identifies isolated muons, reconstructs the dimuon invariant mass, fills a histogram, and produces a Data/MC comparison.
+
+```mermaid
+flowchart LR
+    Data["CMS Open Data"] --> Muons["select isolated<br/>muons"]
+    Muons --> Mass["reconstruct<br/>dimuon mass"]
+    Mass --> Hist["fill<br/>histogram"]
+    Hist --> Plot["render<br/>Data/MC plot"]
+```
+
+The complete analysis is described by [`author.yaml`](https://github.com/FAST-HEP/fasthep-workshop/blob/main/examples/CMS/Zmumu/author.yaml).
+
+---
+
+## Get the data
+
+The example data files are not stored directly in the repository. Their remote locations are described by `examples/CMS/Zmumu/remote_data.json`.
+
+Download them with:
+```bash
+pixi run fasthep download --json examples/CMS/Zmumu/remote_data.json -d data/
+```
+
+The files will be placed under `data/` using the paths expected by the example workflow.
+
+---
+
+## Run the analysis
+
+Run the dimuon workflow with:
 
 ```bash
-pip install "fasthep[minimal]"
+pixi run fasthep run examples/CMS/Zmumu/author.yaml \
+    --outdir build/examples/Zmumu
 ```
 
-This profile is intended for:
-
-- lightweight workflow experimentation
-- non-HEP workflow exploration
-- backend/runtime development
-
-Additional functionality can then be added incrementally through individual packages and profiles.
+FAST-HEP reads the analysis description, compiles it into an execution plan, runs the configured datasets, and writes the results and supporting workflow information to the output directory.
 
 ---
 
-## Workshop installation
+## Inspect the result
 
-The workshop repository contains:
+The final Data/MC plot is written to:
 
-- tutorials
-- runnable examples
-- reference analysis structures
-- training material
+```text
+build/examples/Zmumu/artifacts/plots/DiMuonMass.png
+```
 
-Repository:
+It shows the reconstructed dimuon invariant-mass distribution, including the characteristic Z boson peak around 90 GeV.
 
-- `fasthep-workshop`
+FAST-HEP also writes the compiled workflow graph:
 
-The workshop examples are currently expected to evolve alongside the alpha ecosystem.
+```text
+build/examples/Zmumu/graph/graph.svg
+```
+
+For this analysis, the graph is approximately:
+
+```mermaid
+flowchart LR
+  read_events["read.events<br/>source<br/>root_tree"]
+  stage_BasicVars["stage.BasicVars<br/>transform<br/>hep.define"]
+  stage_DiMuons["stage.DiMuons<br/>transform<br/>hep.di_object_mass"]
+  stage_DiMuonMass["stage.DiMuonMass<br/>transform<br/>hep.hist"]
+  render_DiMuonMass_0["render.DiMuonMass.0<br/>sink<br/>hep.render.data_mc"]
+  read_events -->|stream -> stream| stage_BasicVars
+  stage_BasicVars -->|stream -> stream| stage_DiMuons
+  stage_DiMuons -->|stream -> stream| stage_DiMuonMass
+  stage_DiMuonMass -->|hist -> target| render_DiMuonMass_0
+
+```
+
+This is the executable structure inferred from the declarative analysis description: read the event stream, derive the required variables, reconstruct the dimuon mass, fill the histogram, and render the result.
 
 ---
 
-## Development workspace
+## What else was produced?
 
-Contributors working across multiple packages should use:
+The output directory contains more than the final plot:
 
-- `fasthep-dev`
+```text
+build/examples/Zmumu/
+├── artifacts/    # analysis products
+├── compile/      # normalised workflow and execution plan
+├── graph/        # workflow graph in several formats
+├── render/       # rendering specifications
+├── reports/      # diagnostics and provenance reports
+└── run_summary.yaml
+```
 
-The development workspace provides:
+The `artifacts/` directory contains user-facing analysis outputs such as plots, histograms, cutflows, tables, and provenance records.
 
-- editable installs
-- cross-package testing
-- integration tooling
-- shared developer workflows
+The `compile/` and `graph/` directories expose how FAST-HEP interpreted and planned the workflow. These are particularly useful for inspecting, debugging, and validating an analysis.
+
+For a first run, the two most useful files are:
+
+```text
+artifacts/plots/DiMuonMass.png
+graph/graph.svg
+```
 
 ---
 
-## Next steps
+## Where next?
 
-For most users, the best starting point is the workshop material and runnable examples.
+You have now run a complete FAST-HEP analysis and seen both its scientific output and the workflow FAST-HEP constructed from its description.
 
-Recommended path:
+Where to go next depends on what you want to explore:
 
-1. Explore the [Tutorials]({{< ref "/tutorials/" >}})
-2. Run examples from:
-   - [`fasthep-workshop`](https://github.com/FAST-HEP/fasthep-workshop)
-3. Read:
-   - [Workflow language]({{< ref "/concepts/workflow-language.md" >}})
-4. Explore package-specific documentation:
-   - especially [fasthep-flow docs](https://fasthep-flow.readthedocs.io/en/latest/)
-5. Learn how analyses are structured:
-   - [Analysis repositories]({{< ref "/concepts/analysis-repositories.md" >}})
+* **Build more realistic analyses:** continue with the [FAST-HEP workshop](https://fasthep-workshop.readthedocs.io/en/latest/) for guided tutorials and runnable examples.
+* **Understand the workflow language:** read about [Workflow language]({{< ref "/concepts/workflow-language.md" >}}) or explore the [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/) for the full workflow model, compilation, planning, and execution.
+* **Structure your own analysis:** see [Analysis repositories]({{< ref "/concepts/analysis-repositories.md" >}}).
+* **Explore the toolkit:** see [Packages]({{< ref "/packages/" >}}) for the components that make up FAST-HEP.
 
-Optional deeper reading:
-
-- [Concepts]({{< ref "/concepts/" >}})
-- [Packages]({{< ref "/packages/" >}})

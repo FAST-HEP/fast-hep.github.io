@@ -2,161 +2,128 @@
 title: "FAST-HEP"
 ---
 
-FAST-HEP is an ecosystem of modular tools for declarative High Energy Physics (HEP) workflows, analysis, rendering, metadata management, and reproducible scientific computing.
+FAST-HEP is a toolkit for building declarative High Energy Physics (HEP) analyses.
 
-The project focuses on separating:
-
-- workflow orchestration
-- analysis logic
-- metadata and provenance
-- rendering and reporting
-- experiment-specific extensions
-
-This modular design enables analyses that are:
-
-- easier to understand
-- easier to reproduce
-- easier to validate
-- easier to extend
-- easier to share across collaborations and experiments
-
-FAST-HEP aims to provide modern analysis tooling built around:
-
-- declarative workflows
-- vectorised array programming
-- reproducible environments
-- explicit metadata and provenance
-- composable package ecosystems
-- experiment-independent infrastructure where practical
-
----
-
-## Ecosystem overview
-
-The FAST-HEP ecosystem is built from several focused packages that interact through shared workflow descriptions and extension registries.
+Instead of encoding the entire analysis procedure in a Python program, users describe **what** they want to compute in a workflow. FAST-HEP turns this description into an executable analysis using specialised tools for data processing, metadata and provenance, and visualisation.
 
 ```mermaid
 flowchart LR
+    Analysis["analysis description<br/><b>author.yaml</b>"]
+    FASTHEP["<b>FAST-HEP</b>"]
+    Results["plots, histograms,<br/>cutflows and datasets"]
 
-    Flow["<b>fasthep-flow</b><br/>workflow compilation<br/>and orchestration"]
-
-    Curator["<b>fasthep-curator</b><br/>dataset inspection<br/>metadata and provenance"]
-
-    Carpenter["<b>fasthep-carpenter</b><br/>analysis transforms<br/>histograms and cutflows"]
-
-    Render["<b>fasthep-render</b><br/>plots, reports<br/>and rendering"]
-
-    CLI["<b>fasthep-cli</b><br/>command-line interface"]
-
-    Workshop["<b>fasthep-workshop</b><br/>tutorials, examples<br/>and training material"]
-
-    Flow --> Carpenter
-    Curator --> Carpenter
-    Carpenter --> Render
-    CLI --> Flow
-    Workshop --> Flow
+    Analysis --> FASTHEP --> Results
 ```
+
+The workflow description provides a common representation of the analysis, making it easier to inspect, reproduce, validate, extend, and execute in different computing environments.
+
+{{< admonition note >}}
+FAST-HEP is developed for HEP analysis, while several of its underlying components, including the workflow infrastructure, are designed to be domain-independent.
+{{< /admonition >}}
+
+---
+
+## Toolkit overview
+
+FAST-HEP is built from focused packages that provide different parts of the analysis workflow. They share a common workflow description and can be extended through registries.
+
+```mermaid
+flowchart TD
+
+    Author["<b>author.yaml</b><br/>analysis description"]
+    Flow["<b>fasthep-flow</b><br/>compile, plan and orchestrate"]
+
+    Stream["<b>workflow data streams</b><br/>datasets, fields and metadata"]
+
+    subgraph Capabilities["Registered capabilities"]
+        Curator["<b>fasthep-curator</b><br/>inspection, metadata<br/>and provenance"]
+        Carpenter["<b>fasthep-carpenter</b><br/>transforms, histograms<br/>and cutflows"]
+        Render["<b>fasthep-render</b><br/>plots, reports<br/>and visualisation"]
+    end
+
+    Outputs["<b>Analysis outputs</b><br/>datasets, histograms, cutflows,<br/>plots and reports"]
+
+    Author --> Flow
+    Flow --> Stream
+
+    Stream <--> Curator
+    Stream <--> Carpenter
+    Stream <--> Render
+
+    Stream --> Outputs
+```
+
+The packages are designed to remain focused: `fasthep-flow` provides the general workflow machinery, while other packages add capabilities for HEP analysis, data inspection, and visualisation.
+
+{{< admonition note >}}
+**A note on naming:** `fasthep-flow` is referred to as **Flow** throughout this documentation. In Python, it is imported as `hepflow`.
+{{< /admonition >}}
+
 
 ---
 
 ## Packages
 
-The current FAST-HEP ecosystem includes:
+The FAST-HEP toolkit currently includes:
 
 | Package | Purpose |
 |---|---|
-| `fasthep-flow` | Workflow compilation, planning, runtime orchestration |
-| `fasthep-carpenter` | Analysis transforms, histogramming, awkward/ROOT processing |
-| `fasthep-curator` | Dataset inspection, provenance, diagnostics, metadata |
-| `fasthep-render` | Plotting, reports, rendering pipelines |
+| `fasthep-flow` | Workflow description, compilation, planning, and execution |
+| `fasthep-carpenter` | HEP analysis transforms, histogramming, and columnar data processing |
+| `fasthep-curator` | Dataset inspection, metadata, provenance, and diagnostics |
+| `fasthep-render` | Plotting, reports, and visualisation |
 | `fasthep-cli` | Unified command-line interface |
-| `fasthep-toolbench` | Shared utilities and lightweight tooling |
+| `fasthep-toolbench` | Shared, domain-independent utilities |
 | `fasthep-workshop` | Tutorials, examples, and training material |
-| `fasthep` | Meta package and compatibility bundle |
-| `fasthep-dev` | Integration workspace and ecosystem validation |
+| `fasthep` | Meta-package for installing the FAST-HEP toolkit |
+| `fasthep-dev` | Development and integration workspace |
 
 ---
-
 ## Installation
 
-FAST-HEP packages are published independently and can also be installed through the `fasthep` meta package.
+FAST-HEP packages are published independently and can also be installed through the `fasthep` meta-package.
 
 ```bash
 pip install "fasthep[hep]"
 ```
 
-For ecosystem development and integration testing, see the `fasthep-dev` workspace.
+For tutorials and reproducible example environments, the workshop material uses [Pixi](https://pixi.sh/).
 
----
-
-## Design philosophy
-
-FAST-HEP intentionally separates concerns between packages.
-
-For example:
-
-- `fasthep-flow` owns workflow semantics and orchestration
-- `fasthep-carpenter` owns HEP analysis transforms
-- `fasthep-curator` owns metadata and provenance
-- `fasthep-render` owns visual output and reporting
-
-This separation helps maintain:
-
-- stable interfaces
-- reusable tooling
-- experiment-specific extensibility
-- long-term maintainability
+For development across the full toolkit, see [`fasthep-dev`](https://github.com/FAST-HEP/fasthep-dev).
 
 ---
 
 ## Tutorials and examples
 
-Runnable tutorials and example analyses are provided by:
+The [`fasthep-workshop`](https://fasthep-workshop.readthedocs.io/en/latest/) provides runnable tutorials and example analyses.
 
-- `fasthep-workshop`
+It covers the full path from basic columnar data processing to declarative workflows, custom transforms, rendering, scaling, and accelerator use.
 
-These examples demonstrate:
-
-- declarative workflows
-- custom transforms
-- profile and registry extensions
-- rendering pipelines
-- analysis repository structure
+For a first introduction to FAST-HEP, this is the best place to start.
 
 ---
 
-## Documentation structure
+## Documentation
 
-FAST-HEP documentation is split across several repositories:
+Documentation is split according to purpose:
 
-- this site
-  - ecosystem concepts, architecture, and guides
-
-- package documentation
-  - API and package-specific details
-
-- `fasthep-workshop`
-  - runnable tutorials and examples
+* **This site** — overview of the FAST-HEP toolkit, architecture, and project-level guides
+* [`fasthep-flow`](https://fasthep-flow.readthedocs.io/en/latest/) — declarative workflow descriptions, compilation, planning, and execution
+* [`fasthep-workshop`](https://fasthep-workshop.readthedocs.io/en/latest/) — tutorials, examples, and training material
+* **Package documentation** — API references and package-specific details
 
 ---
 
 ## Contributing
 
-FAST-HEP is developed openly on GitHub.
+FAST-HEP is developed openly on GitHub, and contributions are welcome across code, documentation, examples, testing, and infrastructure.
 
-We welcome contributions including:
-
-- bug reports
-- documentation improvements
-- examples and tutorials
-- infrastructure improvements
-- tests and validation
-- AI-assisted contributions with appropriate review
-
-See the contributing guide for development workflow and ecosystem structure details.
+See the [contributing guide](https://github.com/FAST-HEP/fasthep/blob/main/CONTRIBUTING.md) for the development workflow and toolkit structure.
 
 ---
 
-## Contents
+## Get started
 
-{{< toctree >}}
+New to FAST-HEP?
+
+Start with the [Getting Started](/getting-started/) guide for a first walkthrough of the toolkit, from installation to running a small declarative analysis.

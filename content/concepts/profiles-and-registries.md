@@ -1,306 +1,145 @@
 ---
+
 title: "Profiles and registries"
 weight: 4
 ---
 
-# Profiles and registries
+FAST-HEP keeps capabilities separate from the workflow engine.
 
-FAST-HEP workflows are extensible through registries and profiles.
+**Registries** tell Flow which capabilities are available and how to resolve them.
 
-Registries provide implementations and capabilities.
-Profiles compose and activate those capabilities for workflows.
+**Profiles** compose those capabilities and other configuration into reusable workflow environments.
 
-This mechanism allows FAST-HEP to remain modular while supporting:
+```mermaid
+flowchart LR
+    Packages["packages and<br/>analysis code"]
+    Registry["registries<br/><b>available capabilities</b>"]
+    Profile["profiles<br/><b>composed environment</b>"]
+    Workflow["workflow"]
 
-- experiment-specific extensions
-- custom analysis packages
-- alternative execution behavior
-- reusable workflow infrastructure
+    Packages --> Registry
+    Registry --> Profile
+    Profile --> Workflow
+```
+
+Together, these mechanisms allow FAST-HEP to provide useful defaults while keeping individual capabilities replaceable and independently extensible.
 
 ---
 
 ## Registries
 
-Registries are the mechanism FAST-HEP uses to map workflow concepts to concrete implementations.
+A registry is a catalogue of capabilities available to Flow.
 
-Registries can contribute or override:
+The [`fasthep-carpenter` registry](https://github.com/FAST-HEP/fasthep-carpenter/blob/main/src/fasthep_carpenter/profiles/registry.yaml), for example, provides sources, analysis transforms, sinks, execution modifiers, product handling, and expression functions.
 
-- operations (e.g. transforms, histogramming, selections)
-- sources (e.g. ROOT trees, toy generators, custom readers)
-- sinks (e.g. writing ROOT, parquet, JSON outputs)
-- hooks (e.g. diagnostics, execution extensions, summaries)
-- renderers (e.g. plots, tables, reports)
-- workflow defaults
-
-This allows workflows to remain declarative while different packages provide implementations.
-
----
-
-## Why registries exist
-
-The FAST-HEP workflow language intentionally does not hardcode:
-
-- ROOT support
-- histogramming implementations
-- rendering backends
-- experiment-specific transforms
-- runtime diagnostics
-- custom data formats
-
-Instead, functionality is registered through registries.
-
-This separation allows:
-
-- independent package evolution
-- third-party extensions
-- experiment-specific customisation
-- reusable workflow infrastructure
-- lightweight analysis packages
-
----
-
-## Registry contents
-
-A registry typically maps operation kinds to implementations.
-
-Example concepts include:
-
-- operation specifications
-- runtime implementations
-- source definitions
-- render operations
-- hook registrations
-- sink implementations
-
-For example, a workflow operation:
-
-```yaml
-op: hep.define
-```
-
-may be resolved through a registry entry contributed by `fasthep_carpenter`.
-
-The workflow language itself does not need to know where the implementation originates.
-
-For more detail on operations and specifications, see:
-
-- [Operations and specs]({{< ref "operations-and-specs.md" >}})
-
----
-
-## Registry composition and overrides
-
-Multiple registries may be active simultaneously.
-
-Registries can:
-
-- add new functionality
-- extend existing functionality
-- override previous registrations
-
-This layering mechanism allows analyses and experiments to customise behavior without modifying FAST-HEP core packages directly.
-
-For example:
-
-- a package may provide a custom histogram operation
-- an experiment may override a rendering style
-- an analysis may register experiment-specific transforms
-
-The resulting workflow environment is assembled during workflow compilation.
-
----
-
-## Profiles
-
-Profiles are composable bundles of workflow configuration.
-
-A profile typically activates one or more registries together with workflow defaults and runtime configuration.
-
-Profiles allow analyses to construct custom workflow environments without modifying FAST-HEP core packages.
-
----
-
-## Using profiles
-
-Profiles are activated in `author.yaml`:
-
-```yaml
-use:
-  profiles:
-    - registry
-    - fasthep_carpenter:registry
-    - fasthep_curator:registry
-    - fasthep_render:registry
-```
-
-Each entry references a profile resource.
-
-The general form is:
+For operations, a registry associates a workflow-visible name with its specification and runtime implementation:
 
 ```text
-package_name:profile_name
+hep.define
+    │
+    ├── spec
+    │     describes the operation contract
+    │
+    └── implementation
+          performs the computation
 ```
 
-For example:
+The real Carpenter registry contains entries such as `hep.define`, `hep.hist`, and `hep.di_object_mass`, alongside capabilities for ROOT I/O, GPU execution modifiers, product handling, and expression functions.
 
-```yaml
-- fasthep_render:registry
-```
-
-loads:
-
-```text
-profiles/registry.yaml
-```
-
-from the installed `fasthep_render` package.
+This is how Flow can orchestrate capabilities supplied by other packages while remaining independent of their internal implementation.
 
 ---
 
-## Built-in profiles
+## Profiles and composition
 
-The core workflow package provides built-in profiles such as:
+Profiles provide reusable combinations of capabilities and configuration.
 
-```yaml
-- registry
+For example, the [`hep` profile](https://github.com/FAST-HEP/fasthep-flow/blob/main/src/hepflow/profiles/hep.yaml) combines the capabilities needed for a typical HEP analysis, while the [`hep_debug` profile](https://github.com/FAST-HEP/fasthep-flow/blob/main/src/hepflow/profiles/hep_debug.yaml) builds on it by adding runtime diagnostics.
+
+Profiles can include other profiles, allowing environments to be built through composition:
+
+```mermaid
+flowchart TD
+    Basic["basic"]
+    HEP["hep<br/><b>HEP analysis environment</b>"]
+    Debug["hep_debug<br/><b>runtime diagnostics</b>"]
+    Experiment["experiment profile<br/><b>experiment capabilities</b>"]
+    Analysis["analysis profile<br/><b>analysis-specific capabilities</b>"]
+
+    Basic --> HEP
+    HEP --> Debug
+    HEP --> Experiment
+    Experiment --> Analysis
 ```
 
-These typically provide:
+A workflow can therefore request a useful environment without needing to know which individual packages and registries provide every capability.
 
-- core workflow operations
-- base execution functionality
-- standard planning behavior
+The same composition mechanism is available to experiments and individual analyses. They can add new capabilities or replace existing implementations while continuing to build on the standard FAST-HEP environment.
 
-Additional packages extend the ecosystem through their own registries and profiles.
+This allows customisation through composition rather than by modifying Flow or FAST-HEP packages directly.
 
----
+{{< admonition note >}}
+**Provenance and reproducibility:** FAST-HEP is being extended to record the resolved workflow capabilities, their implementations, and the versions of the packages that provided them as part of the workflow provenance.
 
-## Package-provided profiles
+This will make it possible to determine not only what an analysis requested, but also which concrete software components were used to execute it. This information is important for reproducibility and for diagnosing differences between workflow executions.
 
-Packages commonly expose a registry profile.
+This provenance support is currently under development.
+{{< /admonition >}}
 
-Examples include:
-
-| Package | Typical contents |
-|---|---|
-| `fasthep_carpenter` | transforms, histogramming, ROOT sources |
-| `fasthep_curator` | metadata, provenance, diagnostics |
-| `fasthep_render` | plotting and rendering operations |
-| `fasthep_workshop` | tutorial/example extensions |
-
-A workflow can combine multiple profiles simultaneously.
 
 ---
 
 ## Extending FAST-HEP
 
-Analysis packages can provide their own profiles and registries.
+Registries and profiles are not limited to packages maintained by FAST-HEP.
 
-Example structure:
+Experiments, projects, and individual analyses can provide their own capabilities using the same interfaces as the standard toolkit.
 
-```text
-src/my_analysis/
-├── profiles/
-│   └── registry.yaml
-├── transforms/
-├── hooks/
-├── sinks/
-└── sources/
+For example, an extension package might provide:
+
+* experiment-specific data readers
+* specialised analysis operations
+* alternative implementations of existing operations
+* GPU-oriented runtime behaviour
+* custom product handling
+* additional diagnostics
+
+Those capabilities can then be composed with existing FAST-HEP profiles.
+
+```mermaid
+flowchart LR
+    Core["Flow"]
+    HEP["FAST-HEP<br/>capabilities"]
+    Experiment["experiment<br/>capabilities"]
+    Analysis["analysis-specific<br/>capabilities"]
+
+    Core --> HEP --> Experiment --> Analysis
 ```
 
-This allows analyses to contribute:
-
-- custom transforms
-- custom renderers
-- experiment-specific logic
-- local workflow extensions
-
-without modifying FAST-HEP core packages.
+Flow does not need to distinguish between a capability supplied by FAST-HEP and one supplied by an external package. What matters is that it satisfies the relevant contract.
 
 ---
 
-## Profile resolution
+## Why this matters
 
-FAST-HEP resolves profiles using Python package resources.
+Profiles and registries make extensibility part of the FAST-HEP architecture rather than an additional plugin mechanism layered on top of it.
 
-For example:
+Flow provides the orchestration, while the capabilities that interact with scientific data can come from FAST-HEP, experiments, external projects, or individual analyses.
 
-```yaml
-- fasthep_workshop:registry
-```
-
-causes FAST-HEP to:
-
-1. import `fasthep_workshop`
-2. locate:
-   ```text
-   profiles/registry.yaml
-   ```
-3. load the profile contents
-
-This mechanism allows extensions to behave like normal installable Python packages.
+Combined with the operation contracts described in [Operations and specs]({{< ref "operations-and-specs.md" >}}), this allows implementations to evolve or be replaced without requiring the workflow engine itself to understand their internal details.
 
 ---
 
-## Composition over inheritance
+## Learn more
 
-Profiles are designed to compose rather than deeply inherit from one another.
+This page describes the role of profiles and registries in the FAST-HEP architecture.
 
-A workflow may activate multiple independent profiles:
+For the current profile format, registry schema, composition rules, resource discovery, overrides, and extension interfaces, see the [`fasthep-flow` documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
-```yaml
-use:
-  profiles:
-    - fasthep_carpenter:registry
-    - fasthep_render:registry
-    - my_analysis:registry
-```
+### Related concepts
 
-Each profile contributes functionality to the shared workflow environment.
-
-This keeps the ecosystem modular and extensible.
-
----
-
-## Registries and planning
-
-Registries are resolved before workflow planning begins.
-
-This is important because planners need to understand:
-
-- available operations
-- operation specifications
-- dependency inference behavior
-- runtime capabilities
-- render behavior
-
-before execution plans can be constructed.
-
----
-
-## Design philosophy
-
-Profiles and registries intentionally separate:
-
-- workflow semantics
-- implementation details
-- experiment-specific behavior
-- runtime extensions
-
-This separation helps FAST-HEP support:
-
-- reusable infrastructure
-- experiment-specific tooling
-- lightweight analysis packages
-- independent package releases
-- long-term ecosystem evolution
-
----
-
-## Related concepts
-
-- [Workflow language]({{< ref "workflow-language.md" >}})
-- [Workflow compilation pipeline]({{< ref "author-normalise-plan.md" >}})
-- [Operations and specs]({{< ref "operations-and-specs.md" >}})
-- [Execution backends]({{< ref "execution-backends.md" >}})
-- [Analysis repositories]({{< ref "analysis-repositories.md" >}})
+* [Workflow language]({{< ref "workflow-language.md" >}})
+* [Compilation and execution]({{< ref "compilation-and-execution.md" >}})
+* [Operations and specs]({{< ref "operations-and-specs.md" >}})
+* [Execution environments]({{< ref "execution-environments.md" >}})
+* [Analysis repositories]({{< ref "analysis-repositories.md" >}})

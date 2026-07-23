@@ -1,269 +1,130 @@
 ---
+
 title: "Operations and specs"
 weight: 3
 ---
 
-Operations are the primary executable units in FAST-HEP workflows.
 
-An operation describes:
+Operations are the units of work that Flow orchestrates.
 
-- what computation should happen
-- which inputs are required
-- which outputs are produced
-- how the planner should reason about dependencies
+They may read data, transform it, inspect it, or produce outputs. FAST-HEP provides many operations for common HEP tasks, but operations are deliberately replaceable and can also be supplied by experiments, projects, or individual analyses.
 
-Operations are identified declaratively in workflows using an operation kind:
+The workflow refers to an operation by name, while Flow resolves the implementation separately.
 
-```yaml
-op: hep.define
+```mermaid
+flowchart LR
+    Workflow["workflow<br/><b>hep.define</b>"]
+    Spec["operation spec<br/><b>what it does</b>"]
+    Impl["implementation<br/><b>how it runs</b>"]
+
+    Workflow --> Spec
+    Workflow --> Impl
 ```
 
-The actual implementation is resolved through registries during workflow compilation.
+This separation is central to FAST-HEP: the workflow describes the scientific intent without being tied to one particular implementation.
 
 ---
 
-## Why operations exist
+## Operation roles
 
-FAST-HEP separates:
+At the workflow level, operations have a small number of broad roles.
 
-- workflow structure
-- execution planning
-- runtime implementations
+```mermaid
+flowchart LR
+    Source["source<br/><b>introduce data</b>"]
+    Transform["transform<br/><b>process data</b>"]
+    Observer["observer<br/><b>inspect execution</b>"]
+    Sink["sink<br/><b>produce outputs</b>"]
 
-Operations are the bridge between declarative workflow descriptions and executable analysis logic.
-
-This allows workflows to remain:
-
-- composable
-- inspectable
-- backend-independent
-- extensible through registries
-
----
-
-## Common operation categories
-
-Operations may perform many different tasks.
-
-| Category | Purpose | Example | Typical package |
-|---|---|---|---|
-| sources | introduce external data streams | `root_tree` | `fasthep-carpenter` |
-| transforms | derive or modify event data | `hep.define` | `fasthep-carpenter` |
-|  | apply filtering and cutflows | `hep.selection.cutflow` | `fasthep-carpenter` |
-|  | aggregate or summarise event data | counters, reductions | `fasthep-carpenter` |
-| sinks | persist or aggregate outputs | histogram filling, ROOT/parquet writing | `fasthep-carpenter` |
-|   | generate plots and reports | `hep.render.data_mc` | `fasthep-render` |
-| observers | inspect workflow state | schema snapshots | `fasthep-curator` |
-| hooks | react to runtime lifecycle events | diagnostics, summaries | `fasthep-curator` |
-
-The exact boundary between categories may evolve as the ecosystem matures, but the core separation of responsibilities between packages is intentional.
-
-{{< admonition note >}}
-Rendering is currently registered as a sink because it consumes produced artifacts and writes visual outputs. It may become a more explicit operation category as the rendering API stabilises.
-{{< /admonition >}}
-
----
-
-## Example: derived variables
-
-Example operation:
-
-```yaml
-- id: BasicVars
-  op: hep.define
-  params:
-    variables:
-      - name: Muon_Pt
-        expr: "sqrt(Muon_Px ** 2 + Muon_Py ** 2)"
+    Source --> Transform --> Sink
+    Transform -.-> Observer
 ```
 
-This operation:
+For example, an operation might:
 
-- depends on:
-  - `Muon_Px`
-  - `Muon_Py`
+* read events from a ROOT file
+* derive a new quantity
+* apply a selection
+* fill a histogram
+* inspect schema or provenance information
+* write a dataset
+* render a plot
 
-- produces:
-  - `Muon_Pt`
-
-FAST-HEP uses this information during dependency inference and planning.
+The precise operation catalogue belongs to the packages that provide those capabilities rather than to Flow itself.
 
 ---
 
-## Example: histogramming
+## Specs
 
-```yaml
-- id: DiMuonMass
-  op: hep.hist
-  params:
-    axes:
-      - name: dimu_mass
-        source: DiMuon_Mass
-        type: regular
-        bins:
-          low: 60
-          high: 120
-          nbins: 60
+Each operation exposes a specification, or **spec**, describing the parts of its behaviour that Flow needs to understand.
+
+A spec can describe things such as:
+
+* the inputs an operation expects
+* the products it creates
+* how those products move through the workflow
+* constraints relevant to planning and validation
+* configuration accepted by the operation
+
+The runtime implementation remains responsible for performing the actual computation.
+
+```mermaid
+flowchart TD
+    Spec["spec<br/><b>planner-visible contract</b>"]
+    Flow["Flow"]
+    Impl["implementation<br/><b>runtime behaviour</b>"]
+
+    Spec --> Flow
+    Flow --> Impl
 ```
 
-This operation consumes event-level quantities and produces histogram artifacts.
+Because the spec is separate from the implementation, Flow can reason about an analysis before processing scientific data.
 
-Histogram operations are commonly followed by rendering operations.
-
----
-
-## Example: rendering
-
-Rendering is usually attached declaratively to produced artifacts:
-
-```yaml
-render:
-  style: dimuon_mass
-  when: final
-```
-
-Rendering operations may produce:
-
-- plots
-- tables
-- reports
-- dashboards
-- summaries
-
-The rendering implementation is resolved through registries and styles.
+This supports dependency analysis, validation, workflow inspection, and execution planning without requiring Flow to know the internal details of the operation.
 
 ---
 
-## Specifications
+## Replaceable implementations
 
-Operations are accompanied by specifications ("specs").
+The same workflow-level capability does not have to be permanently tied to a single implementation.
 
-Specs describe operation behavior in a planner-friendly and machine-readable form.
+An operation can be replaced or reimplemented as long as it satisfies the contract expected by Flow.
 
-Depending on the operation type, specs may describe:
+This allows implementations to evolve independently as:
 
-- required inputs
-- produced outputs
-- stream behavior
-- aggregation semantics
-- partition behavior
-- render expectations
-- configuration schemas
+* software libraries change
+* data formats change
+* new algorithms become available
+* different experiments require specialised behaviour
+* workloads move between CPUs, GPUs, or other computing resources
 
-Specs help FAST-HEP reason about workflows before runtime execution begins.
+The orchestration layer therefore does not need to own the scientific data-processing implementation.
 
----
-
-## Why specs matter
-
-Specs allow planners to understand workflows without executing analysis code.
-
-This enables:
-
-- dependency inference
-- validation
-- execution planning
-- artifact prediction
-- schema reasoning
-- runtime diagnostics
-
-without requiring immediate data processing.
-
-This separation is one of the key architectural ideas in FAST-HEP.
+This replaceability is one of the main architectural principles of FAST-HEP.
 
 ---
 
-## Planner-visible behavior
+## How operations become available
 
-Operations often expose planner-visible behavior separately from runtime implementations.
+Operations are made available to workflows through registries, which associate workflow-visible names with their specifications and runtime implementations.
 
-For example:
+Profiles then compose registries and other configuration into reusable environments for particular use cases.
 
-- runtime implementation
-  - performs the actual computation
+For example, a HEP profile can make HEP analysis, rendering, metadata, and provenance capabilities available together without those capabilities becoming part of Flow itself.
 
-- spec implementation
-  - describes dependencies and outputs
-
-This allows planners to construct execution graphs before runtime execution begins.
+See [Profiles and registries]({{< ref "profiles-and-registries.md" >}}) for an overview of how this composition works.
 
 ---
 
-## Registry integration
+## Learn more
 
-Operations are registered through registries.
+This page describes the role of operations and specs in the FAST-HEP architecture.
 
-For example:
+For the current operation contract, spec format, product handling, runtime interfaces, and implementation details, see the [`fasthep-flow` documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
-```yaml
-op: hep.hist
-```
+### Related concepts
 
-may resolve to:
-
-- a spec implementation
-- a runtime implementation
-- render integrations
-- diagnostics hooks
-
-provided by `fasthep_carpenter`.
-
-This resolution occurs during workflow compilation.
-
-For more detail, see:
-
-- [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
-
----
-
-## Runtime independence
-
-Operations intentionally avoid coupling workflows to specific runtimes.
-
-The same operation definitions may eventually support:
-
-- local execution
-- distributed execution
-- GPU execution
-- batch/grid systems
-
-without changing the workflow description itself.
-
----
-
-## Historical note
-
-Earlier FAST-HEP prototypes exposed some operation specifications as generated JSON artifacts.
-
-This made planner-visible behavior easier to inspect and debug.
-
-Future FAST-HEP versions may again expose richer spec artifacts and planner diagnostics as part of workflow introspection tooling.
-
----
-
-## Design philosophy
-
-Operations and specs intentionally separate:
-
-- declarative workflow meaning
-- planning semantics
-- runtime execution details
-
-This separation helps workflows remain:
-
-- inspectable
-- extensible
-- portable
-- easier to validate
-- easier to debug
-
----
-
-## Related concepts
-
-- [Workflow language]({{< ref "workflow-language.md" >}})
-- [Workflow compilation pipeline]({{< ref "author-normalise-plan.md" >}})
-- [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
-- [Execution backends]({{< ref "execution-backends.md" >}})
-- [Analysis repositories]({{< ref "analysis-repositories.md" >}})
-
+* [Workflow language]({{< ref "workflow-language.md" >}})
+* [Compilation and execution]({{< ref "compilation-and-execution.md" >}})
+* [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
+* [Execution environments]({{< ref "execution-environments.md" >}})
