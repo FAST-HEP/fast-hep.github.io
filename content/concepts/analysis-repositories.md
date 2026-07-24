@@ -4,8 +4,6 @@ title: "Analysis repositories"
 weight: 6
 ---
 
-# Analysis repositories
-
 FAST-HEP encourages analyses to be structured as installable Python packages.
 
 This provides a natural place for:

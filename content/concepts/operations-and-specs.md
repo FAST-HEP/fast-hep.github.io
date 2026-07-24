@@ -4,7 +4,6 @@ title: "Operations and specs"
 weight: 3
 ---
 
-
 Operations are the units of work that Flow orchestrates.
 
 They may read data, transform it, inspect it, or produce outputs. FAST-HEP provides many operations for common HEP tasks, but operations are deliberately replaceable and can also be supplied by experiments, projects, or individual analyses.

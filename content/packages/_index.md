@@ -2,246 +2,192 @@
 title: "Packages"
 ---
 
-The FAST-HEP ecosystem is split into focused packages.
+FAST-HEP is developed as a collection of focused packages.
 
-Each package owns a small part of the workflow stack and exposes functionality through public APIs, profiles, registries, or command-line tools.
+Most users do not need to install or interact with these packages individually. The [`fasthep`](https://github.com/FAST-HEP/fasthep) meta package provides curated installations that bring together the components needed for common use cases.
+
+The package split becomes useful when you want to understand where a capability comes from, use a component independently, or extend FAST-HEP with your own implementations.
+
+---
+
+## Toolkit overview
+
+The main packages have distinct responsibilities:
 
 ```mermaid
-flowchart LR
+flowchart TD
+    Flow["<b>Flow</b><br/>workflow compilation<br/>and orchestration"]
 
-    Flow["<b>fasthep-flow</b><br/>workflow compilation<br/>and orchestration"]
+    Carpenter["<b>Carpenter</b><br/>HEP analysis<br/>and data processing"]
+    Curator["<b>Curator</b><br/>inspection, metadata<br/>and provenance"]
+    Render["<b>Render</b><br/>plots and reports"]
 
-    Curator["<b>fasthep-curator</b><br/>dataset inspection<br/>metadata and provenance"]
+    CLI["<b>CLI</b><br/>user interface"]
 
-    Carpenter["<b>fasthep-carpenter</b><br/>analysis transforms<br/>histograms and cutflows"]
-
-    Render["<b>fasthep-render</b><br/>plots, reports<br/>and rendering"]
-
-    CLI["<b>fasthep-cli</b><br/>command-line interface"]
-
-    Workshop["<b>fasthep-workshop</b><br/>tutorials, examples<br/>and training material"]
-
-    Flow --> Carpenter
-    Curator --> Carpenter
-    Carpenter --> Render
     CLI --> Flow
-    Workshop --> Flow
+
+    Carpenter -->|"capabilities"| Flow
+    Curator -->|"capabilities"| Flow
+    Render -->|"capabilities"| Flow
 ```
 
-## Overview
+Flow provides the orchestration layer. Carpenter, Curator, Render, and external packages provide capabilities that Flow can compose and execute.
 
-| Package | Purpose | Documentation | Git Repo | 
-|---|---|---|---|
-| `fasthep-flow` | Workflow compilation, planning, runtime orchestration | [API docs](https://fasthep-flow.readthedocs.io/en/latest/) | [FAST-HEP/fasthep-flow](https://github.com/FAST-HEP/fasthep-flow) |
-| `fasthep-carpenter` | Analysis transforms, histogramming, awkward/ROOT processing | [API docs](https://fasthep-carpenter.readthedocs.io/en/latest/) | [FAST-HEP/fasthep-carpenter](https://github.com/FAST-HEP/fasthep-carpenter) |
-| `fasthep-curator` | Dataset inspection, provenance, diagnostics, metadata | [API docs](https://fasthep-curator.readthedocs.io/en/latest/) | [FAST-HEP/fasthep-curator](https://github.com/FAST-HEP/fasthep-curator) |
-| `fasthep-render` | Plotting, reports, rendering pipelines | [API docs](https://fasthep-render.readthedocs.io/en/latest/) | [FAST-HEP/fasthep-render](https://github.com/FAST-HEP/fasthep-render) |
-| `fasthep-cli` | Unified command-line interface | [API docs](https://fasthep-cli.readthedocs.io/en/latest/) |  [FAST-HEP/fasthep-cli](https://github.com/FAST-HEP/fasthep-cli) |
-| `fasthep-toolbench` | Shared utilities and lightweight tooling | [API docs](https://fasthep-toolbench.readthedocs.io/en/latest/)  |  [FAST-HEP/fasthep-toolbench](https://github.com/FAST-HEP/fasthep-toolbench) |
-| `fasthep-workshop` | Tutorials, examples, and training material | --- | [FAST-HEP/fasthep-workshop](https://github.com/FAST-HEP/fasthep-workshop) |
-| `fasthep` | Meta package and compatibility bundle | --- | [FAST-HEP/fasthep](https://github.com/FAST-HEP/fasthep) |
-| `fasthep-dev` | Integration workspace and ecosystem validation | --- | [FAST-HEP/fasthep-dev](https://github.com/FAST-HEP/fasthep-dev) |
+This is not a closed set: experiments, projects, and individual analyses can provide capabilities through the same interfaces.
 
 ---
 
-## `fasthep-flow`
+## Core toolkit
 
-`fasthep-flow` provides the core work**flow** engine. It is the package responsible for turning declarative workflow descriptions into executable plans.
+### `fasthep-flow`
 
-It owns:
+**Flow** is the workflow engine.
 
-- workflow compilation
-- normalisation
-- execution planning
-- runtime orchestration
-- registry/profile loading
-- backend interfaces
+It provides the general infrastructure for:
 
+* authoring and compiling workflows
+* constructing execution plans
+* orchestrating operations
+* profiles and registries
+* execution environments
 
-Full documentation:
+Flow is designed to remain largely domain-independent. HEP-specific analysis functionality is provided by other packages rather than built into the workflow engine.
 
-- [fasthep-flow API docs](https://fasthep-flow.readthedocs.io/en/latest/)
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-flow)
-
-{{< admonition note >}}
-Despite the `hep` in the package name, `fasthep-flow` aims to remain largely HEP agnostic. The workflow compilation and orchestration layers are intentionally separated from experiment-specific analysis logic where practical.
-{{< /admonition >}}
+[Documentation](https://fasthep-flow.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-flow)
 
 ---
 
-## `fasthep-carpenter`
+### `fasthep-carpenter`
 
-`fasthep-carpenter` provides common HEP analysis building blocks.
+**Carpenter** provides common HEP data-processing and analysis capabilities.
 
-It owns:
+These include:
 
-- analysis transforms
-- ROOT/awkward data handling
-- histogram filling
-- cutflows
-- object reconstruction helpers
-- output writers
+* ROOT and Awkward Array data handling
+* derived quantities and selections
+* histogramming and cutflows
+* common HEP operations
+* data writers
+* specialised execution capabilities
 
-The name comes from the original idea of turning ROOT **trees** into **table**-like analysis products.
+Carpenter provides these capabilities to Flow through registries and operation contracts, allowing them to evolve independently of the workflow engine.
 
-Full documentation:
-
-- [fasthep-carpenter API docs](https://fasthep-carpenter.readthedocs.io/en/latest/)
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-carpenter)
+[Documentation](https://fasthep-carpenter.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-carpenter)
 
 ---
 
-## `fasthep-curator`
+### `fasthep-curator`
 
-`fasthep-curator` provides dataset and metadata tooling.
+**Curator** provides inspection, metadata, provenance, and diagnostic capabilities.
 
-It owns:
+These include:
 
-- dataset inspection
-- schema snapshots
-- provenance capture
-- diagnostics
-- validation helpers
-- runtime reporting hooks
+* dataset and schema inspection
+* provenance collection
+* runtime diagnostics
+* validation and reporting
 
-The name reflects its role as a curator of metadata, provenance, and diagnostic information around workflows.
+Curator focuses on understanding and recording what happens around an analysis without owning its scientific transformations.
 
-Full documentation:
-
-- [fasthep-curator API docs](https://fasthep-curator.readthedocs.io/en/latest/)
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-curator)
+[Documentation](https://fasthep-curator.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-curator)
 
 ---
 
-## `fasthep-render`
+### `fasthep-render`
 
-`fasthep-render` provides visual and report output.
+**Render** provides visualisation and reporting capabilities.
 
-It owns:
+These include:
 
-- plots
-- tables
-- reports
-- render styles
-- rendering sinks
-- publication-oriented visual outputs
+* scientific plots
+* tables and reports
+* reusable rendering styles
+* publication-oriented outputs
 
-Full documentation:
+Rendering is kept separate from the analysis operations that produce the underlying scientific products.
 
-- [fasthep-render API docs](https://fasthep-render.readthedocs.io/en/latest/)
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-render)
+[Documentation](https://fasthep-render.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-render)
 
 ---
 
-## `fasthep-cli`
+### `fasthep-cli`
 
-`fasthep-cli` provides the unified `fasthep` command-line interface.
+**CLI** provides the user-facing `fasthep` command.
 
-It owns:
+For example:
 
-- user-facing commands
-- workflow command dispatch
-- package/version inspection
-- example downloads
-- CLI output formatting
+```bash
+fasthep run author.yaml
+```
 
-The CLI is intentionally thin. It should call public APIs from the owning packages rather than duplicating implementation logic.
+The CLI provides a common interface to functionality owned by the other FAST-HEP packages rather than implementing workflow or analysis behaviour itself.
 
-Full documentation:
-
-- [fasthep-cli API docs](https://fasthep-cli.readthedocs.io/en/latest/)
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-cli)
+[Documentation](https://fasthep-cli.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-cli)
 
 ---
 
-## `fasthep-toolbench`
+## Installation and supporting packages
 
-`fasthep-toolbench` provides shared utilities used by other FAST-HEP packages.
+### `fasthep`
 
-It owns lightweight helpers for:
+The [`fasthep`](https://github.com/FAST-HEP/fasthep) meta package is the recommended installation entry point.
 
-- display (terminal)
-- downloads
-- package discovery
-- user-facing utility functions
-
-It should remain small and should not contain workflow, analysis, rendering, or metadata ownership logic.
-
-Repository:
-
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-toolbench)
-
----
-
-## `fasthep-workshop`
-
-`fasthep-workshop` contains tutorials, examples, and training material.
-
-It is also intended to act as a reference analysis-style repository, showing how an analysis can provide:
-
-- profiles
-- registries
-- custom sources
-- custom transforms
-- runnable examples
-
-Repository:
-
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-workshop)
-
----
-
-## `fasthep`
-
-`fasthep` is the meta package.
-
-It provides curated installation profiles and, in future, verified compatibility bundles across the FAST-HEP ecosystem.
-
-Typical installation:
+For a typical HEP environment:
 
 ```bash
 pip install "fasthep[hep]"
 ```
 
-Repository:
-
-- [GitHub repository](https://github.com/FAST-HEP/fasthep)
+It provides curated combinations of FAST-HEP packages so users do not need to manage the toolkit components individually.
 
 ---
 
-## `fasthep-dev`
+### `fasthep-toolbench`
 
-`fasthep-dev` is the integration workspace.
+[`fasthep-toolbench`](https://github.com/FAST-HEP/fasthep-toolbench) contains small shared utilities used across the toolkit, including download, package-discovery, and terminal helpers.
 
-It is not an installable Python package. It collects FAST-HEP repositories as Git submodules and provides shared tooling for:
-
-- cross-package development
-- smoke testing
-- release validation
-- package coordination
-- AI/developer navigation
-
-Repository:
-
-- [GitHub repository](https://github.com/FAST-HEP/fasthep-dev)
+Most users will encounter Toolbench indirectly through other FAST-HEP packages.
 
 ---
 
-## Package boundaries
+## Examples and development
 
-The package split is intentional.
+### `fasthep-workshop`
 
-As a rule of thumb:
+[`fasthep-workshop`](https://github.com/FAST-HEP/fasthep-workshop) contains the runnable examples and tutorials used throughout the FAST-HEP documentation and training material.
 
-- workflow semantics belong in `fasthep-flow`
-- HEP transforms and ROOT/awkward handling belong in `fasthep-carpenter`
-- metadata and diagnostics belong in `fasthep-curator`
-- visual output belongs in `fasthep-render`
-- user commands belong in `fasthep-cli`
-- examples belong in `fasthep-workshop`
-- integration testing belongs in `fasthep-dev`
+It also demonstrates how analysis repositories can provide their own workflows, profiles, operations, and supporting code.
 
-For more detail, see:
+[Workshop documentation](https://fasthep-workshop.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-workshop)
 
-- [Profiles and registries]({{< ref "/concepts/profiles-and-registries.md" >}})
-- [Analysis repositories]({{< ref "/concepts/analysis-repositories.md" >}})
+---
+
+### `fasthep-dev`
+
+[`fasthep-dev`](https://github.com/FAST-HEP/fasthep-dev) is the integration workspace used when developing multiple FAST-HEP packages together.
+
+It provides a common environment for cross-package development, integration testing, and coordinated ecosystem validation.
+
+Most FAST-HEP users do not need `fasthep-dev`.
+
+---
+
+## Which package should I use?
+
+For most users, the answer is simply **FAST-HEP as a whole**: install the `fasthep` meta package and use the `fasthep` command-line interface.
+
+Individual packages become relevant when you want to go deeper:
+
+| If you want to...                                 | Start with          |
+| ------------------------------------------------- | ------------------- |
+| describe, compile, or orchestrate workflows       | `fasthep-flow`      |
+| process HEP data or add analysis operations       | `fasthep-carpenter` |
+| inspect data or work with metadata and provenance | `fasthep-curator`   |
+| create plots and reports                          | `fasthep-render`    |
+| understand or extend the command-line interface   | `fasthep-cli`       |
+| learn FAST-HEP through runnable examples          | `fasthep-workshop`  |
+| develop several FAST-HEP packages together        | `fasthep-dev`       |
+
+FAST-HEP packages use the same extension mechanisms available to experiment and analysis packages. The toolkit is therefore a collection of useful implementations built around Flow rather than a fixed set of capabilities built into it.
+
+For more about this architecture, see [Profiles and registries]({{< ref "/concepts/profiles-and-registries.md" >}}) and [Analysis repositories]({{< ref "/concepts/analysis-repositories.md" >}}).
