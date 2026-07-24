@@ -1,48 +1,32 @@
-baseURL = 'http://fast-hep.github.io/'
-locale = 'en-US'
-title = 'FAST-HEP'
-enableEmoji = true
-# theme = "hugo-geekdoc"
+baseURL = "https://fast-hep.github.io/"
+locale = "en-US"
+title = "FAST-HEP"
+
 theme = "scientific-python-hugo-theme"
 
+enableEmoji = true
+enableRobotsTXT = true
 pluralizeListTitles = false
-
-# Geekdoc required configuration
-pygmentsUseClasses = true
-pygmentsCodeFences = true
 disablePathToLower = true
 
-# Required if you want to render robots.txt template
-enableRobotsTXT = true
+disableKinds = ["taxonomy", "term"]
 
-disableKinds = ["taxonomy"]
-
-# Needed for mermaid shortcodes
 [markup]
-  defaultMarkdownHandler = 'goldmark'
-  [markup.goldmark.renderer]
-    # Needed for mermaid shortcode
-    unsafe = true
-  [markup.tableOfContents]
-    startLevel = 1
-    endLevel = 9
+defaultMarkdownHandler = "goldmark"
 
-[taxonomies]
-   tag = "tags"
+  [markup.goldmark.renderer]
+  unsafe = true
+
+  [markup.tableOfContents]
+  startLevel = 2
+  endLevel = 4
 
 [params]
-images = [
-  "/images/fast-hep-black.png",
-  "/images/fast-hep-white.png",
-  "/images/fast-hep-black-squareBkg.png",
-  "/images/favicon.ico",
-]
 custom_css = ["css/custom.css"]
 sidebar = true
 
 [params.navbarlogo]
 image = "fast-hep-black.png"
-# text = "FAST-HEP"
 link = "/"
 
 [params.author]
@@ -63,10 +47,6 @@ url = "/packages/"
 [[params.navbar]]
 title = "Tutorials"
 url = "/tutorials/"
-
-[[params.navbar]]
-title = "Talks"
-url = "/talks/"
 
 [[params.navbar]]
 title = "Contributing"
@@ -105,7 +85,11 @@ icon = "discourse"
   title = "Documentation"
 
   [[params.footer.quicklinks.column2.links]]
-  text = "Workflow concepts"
+  text = "Getting started"
+  link = "/getting-started/"
+
+  [[params.footer.quicklinks.column2.links]]
+  text = "Concepts"
   link = "/concepts/"
 
   [[params.footer.quicklinks.column2.links]]
@@ -117,16 +101,16 @@ icon = "discourse"
   link = "/tutorials/"
 
   [params.footer.quicklinks.column3]
-  title = "Packages"
+  title = "Resources"
 
   [[params.footer.quicklinks.column3.links]]
-  text = "fasthep-flow"
-  link = "https://github.com/FAST-HEP/fasthep-flow"
+  text = "Workshop"
+  link = "https://fasthep-workshop.readthedocs.io/en/latest/"
 
   [[params.footer.quicklinks.column3.links]]
-  text = "fasthep-carpenter"
-  link = "https://github.com/FAST-HEP/fasthep-carpenter"
+  text = "Flow documentation"
+  link = "https://fasthep-flow.readthedocs.io/en/latest/"
 
   [[params.footer.quicklinks.column3.links]]
-  text = "fasthep-curator"
-  link = "https://github.com/FAST-HEP/fasthep-curator"
+  text = "Contributing"
+  link = "https://github.com/FAST-HEP/fasthep/blob/main/CONTRIBUTING.md"
