@@ -22,7 +22,6 @@ defaultMarkdownHandler = "goldmark"
   endLevel = 4
 
 [params]
-custom_css = ["css/custom.css"]
 sidebar = true
 
 [params.navbarlogo]
