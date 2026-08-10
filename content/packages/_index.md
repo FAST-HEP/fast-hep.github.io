@@ -16,22 +16,22 @@ The main packages have distinct responsibilities:
 
 ```mermaid
 flowchart TD
-    Flow["<b>Flow</b><br/>workflow compilation<br/>and orchestration"]
+    CLI["<b>CLI</b><br/>user interface"]:::input
 
-    Carpenter["<b>Carpenter</b><br/>HEP analysis<br/>and data processing"]
-    Curator["<b>Curator</b><br/>inspection, metadata<br/>and provenance"]
-    Render["<b>Render</b><br/>plots and reports"]
+    Flow["<b>Flow</b><br/>compile, plan,<br/>orchestrate"]:::flow
 
-    CLI["<b>CLI</b><br/>user interface"]
+    Carpenter["<b>Carpenter</b><br/>HEP data processing"]:::capability
+    Curator["<b>Curator</b><br/>inspection + provenance"]:::capability
+    Render["<b>Render</b><br/>visualisation + reports"]:::capability
 
     CLI --> Flow
 
-    Carpenter -->|"capabilities"| Flow
-    Curator -->|"capabilities"| Flow
-    Render -->|"capabilities"| Flow
+    Carpenter -.->|"registered capabilities"| Flow
+    Curator -.->|"registered capabilities"| Flow
+    Render -.->|"registered capabilities"| Flow
 ```
 
-Flow provides the orchestration layer. Carpenter, Curator, Render, and external packages provide capabilities that Flow can compose and execute.
+Flow provides the workflow compilation, planning, and runtime machinery. Carpenter, Curator, Render, and external packages contribute capabilities through registries and stable contracts.
 
 This is not a closed set: experiments, projects, and individual analyses can provide capabilities through the same interfaces.
 
@@ -41,15 +41,15 @@ This is not a closed set: experiments, projects, and individual analyses can pro
 
 ### `fasthep-flow`
 
-**Flow** is the workflow engine.
+**Flow** is the workflow compiler and runtime.
 
 It provides the general infrastructure for:
 
-* authoring and compiling workflows
-* constructing execution plans
-* orchestrating operations
+* workflow description and normalisation
+* logical graph construction and compiler analysis
+* execution planning
 * profiles and registries
-* execution environments
+* runtime orchestration and execution backends
 
 Flow is designed to remain largely domain-independent. HEP-specific analysis functionality is provided by other packages rather than built into the workflow engine.
 
@@ -63,9 +63,9 @@ Flow is designed to remain largely domain-independent. HEP-specific analysis fun
 
 These include:
 
-* ROOT and Awkward Array data handling
+* data readers and writers, including ROOT-based workflows
 * derived quantities and selections
-* histogramming and cutflows
+* histogramming, aggregation, and cutflows
 * common HEP operations
 * data writers
 * specialised execution capabilities
@@ -85,7 +85,7 @@ These include:
 * dataset and schema inspection
 * provenance collection
 * runtime diagnostics
-* validation and reporting
+* inspection reports and diagnostics
 
 Curator focuses on understanding and recording what happens around an analysis without owning its scientific transformations.
 
@@ -117,10 +117,10 @@ Rendering is kept separate from the analysis operations that produce the underly
 For example:
 
 ```bash
-fasthep run author.yaml
+fasthep run workflow.yaml
 ```
 
-The CLI provides a common interface to functionality owned by the other FAST-HEP packages rather than implementing workflow or analysis behaviour itself.
+The CLI provides a common interface to capabilities and workflows provided by the other FAST-HEP packages rather than implementing workflow or analysis behaviour itself.
 
 [Documentation](https://fasthep-cli.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-cli)
 
@@ -180,8 +180,8 @@ Individual packages become relevant when you want to go deeper:
 
 | If you want to...                                 | Start with          |
 | ------------------------------------------------- | ------------------- |
-| describe, compile, or orchestrate workflows       | `fasthep-flow`      |
-| process HEP data or add analysis operations       | `fasthep-carpenter` |
+| describe, compile, plan, or execute workflows     | `fasthep-flow`      |
+| read/write HEP data or add analysis operations    | `fasthep-carpenter` |
 | inspect data or work with metadata and provenance | `fasthep-curator`   |
 | create plots and reports                          | `fasthep-render`    |
 | understand or extend the command-line interface   | `fasthep-cli`       |
