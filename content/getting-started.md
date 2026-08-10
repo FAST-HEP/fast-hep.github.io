@@ -5,14 +5,17 @@ title: "Getting started"
 
 This guide walks through a small FAST-HEP analysis using CMS Open Data.
 
-FAST-HEP analyses are described declaratively: you describe **what** you want to compute, while FAST-HEP determines how the corresponding workflow should be constructed and executed.
+A FAST-HEP analysis starts with a workflow description. You describe the
+scientific operations you want to perform, while Flow validates the workflow,
+resolves its capabilities and dependencies, and constructs an execution plan
+before the analysis is run.
 
 By the end of this guide, you will have:
 
-* set up a reproducible FAST-HEP environment
-* run a dimuon analysis using CMS Open Data
-* produced a Data/MC comparison of the dimuon invariant mass
-* seen how the analysis is described in `author.yaml`
+- set up a reproducible FAST-HEP environment
+- run a dimuon analysis using CMS Open Data
+- produced a Data/MC comparison of the dimuon invariant mass
+- inspected the logical graph and execution plan constructed from `workflow.yaml`
 
 {{< admonition warning >}}
 FAST-HEP is currently undergoing a major rewrite and is in alpha development.
@@ -53,7 +56,7 @@ We will use the CMS Open Data dimuon example:
 
 ```text
 examples/CMS/Zmumu/
-├── author.yaml
+├── workflow.yaml
 └── remote_data.json
 ```
 
@@ -63,13 +66,16 @@ It reads muon information from ROOT files, identifies isolated muons, reconstruc
 
 ```mermaid
 flowchart LR
-    Data["CMS Open Data"] --> Muons["select isolated<br/>muons"]
-    Muons --> Mass["reconstruct<br/>dimuon mass"]
-    Mass --> Hist["fill<br/>histogram"]
-    Hist --> Plot["render<br/>Data/MC plot"]
+    Data["CMS Open Data<br/><b>ROOT source</b>"]:::source
+    Muons["select isolated<br/>muons"]:::transform
+    Mass["reconstruct<br/>dimuon mass"]:::transform
+    Hist["fill<br/>histogram"]:::transform
+    Plot["render<br/>Data/MC plot"]:::sink
+
+    Data --> Muons --> Mass --> Hist --> Plot
 ```
 
-The complete analysis is described by [`author.yaml`](https://github.com/FAST-HEP/fasthep-workshop/blob/main/examples/CMS/Zmumu/author.yaml).
+The complete analysis is described by [`workflow.yaml`](https://github.com/FAST-HEP/fasthep-workshop/blob/main/examples/CMS/Zmumu/workflow.yaml).
 
 ---
 
@@ -91,11 +97,27 @@ The files will be placed under `data/` using the paths expected by the example w
 Run the dimuon workflow with:
 
 ```bash
-pixi run fasthep run examples/CMS/Zmumu/author.yaml \
+pixi run fasthep run examples/CMS/Zmumu/workflow.yaml \
     --outdir build/examples/Zmumu
 ```
 
-FAST-HEP reads the analysis description, compiles it into an execution plan, runs the configured datasets, and writes the results and supporting workflow information to the output directory.
+Flow compiles the workflow description into an execution plan and then executes
+that plan for the configured datasets. Analysis artifacts together with compilation and execution records are written
+to the output directory.
+
+```mermaid
+flowchart LR
+    Workflow["<b>workflow.yaml</b>"]:::input
+    Normal["<b>Normalised<br/>workflow</b>"]:::flow
+    Graph["<b>Logical<br/>graph</b>"]:::flow
+    Plan["<b>Execution<br/>plan</b>"]:::plan
+    Run["<b>Runtime</b>"]:::runtime
+    Result["<b>Artifacts</b>"]:::artifact
+
+    Workflow --> Normal --> Graph --> Plan --> Run --> Result
+```
+
+The files in the output directory expose these stages rather than hiding them inside Flow.
 
 ---
 
@@ -109,7 +131,7 @@ build/examples/Zmumu/artifacts/plots/DiMuonMass.png
 
 It shows the reconstructed dimuon invariant-mass distribution, including the characteristic Z boson peak around 90 GeV.
 
-FAST-HEP also writes the compiled workflow graph:
+Flow also writes the logical graph:
 
 ```text
 build/examples/Zmumu/graph/graph.svg
@@ -119,19 +141,25 @@ For this analysis, the graph is approximately:
 
 ```mermaid
 flowchart LR
-  read_events["read.events<br/>source<br/>root_tree"]
-  stage_BasicVars["stage.BasicVars<br/>transform<br/>hep.define"]
-  stage_DiMuons["stage.DiMuons<br/>transform<br/>hep.di_object_mass"]
-  stage_DiMuonMass["stage.DiMuonMass<br/>transform<br/>hep.hist"]
-  render_DiMuonMass_0["render.DiMuonMass.0<br/>sink<br/>hep.render.data_mc"]
-  read_events -->|stream -> stream| stage_BasicVars
-  stage_BasicVars -->|stream -> stream| stage_DiMuons
-  stage_DiMuons -->|stream -> stream| stage_DiMuonMass
-  stage_DiMuonMass -->|hist -> target| render_DiMuonMass_0
+  read_events["<b>read.events</b><br/>root_tree"]:::source
+  stage_BasicVars["<b>stage.BasicVars</b><br/>hep.define"]:::transform
+  stage_DiMuons["<b>stage.DiMuons</b><br/>hep.di_object_mass"]:::transform
+  stage_DiMuonMass["<b>stage.DiMuonMass</b><br/>hep.hist"]:::transform
+  render_DiMuonMass_0["<b>render.DiMuonMass.0</b><br/>hep.render.data_mc"]:::sink
+
+  read_events -->|stream| stage_BasicVars
+  stage_BasicVars -->|stream| stage_DiMuons
+  stage_DiMuons -->|stream| stage_DiMuonMass
+  stage_DiMuonMass -->|hist| render_DiMuonMass_0
 
 ```
 
-This is the executable structure inferred from the declarative analysis description: read the event stream, derive the required variables, reconstruct the dimuon mass, fill the histogram, and render the result.
+The logical graph makes the workflow's data flow explicit: read the event
+stream, derive the required variables, reconstruct the dimuon mass, fill the
+histogram, and render the result.
+
+Compilation continues from this representation by resolving dependencies and
+constructing the execution plan used by the runtime.
 
 ---
 
@@ -143,33 +171,46 @@ The output directory contains more than the final plot:
 build/examples/Zmumu/
 ├── artifacts/    # analysis products
 ├── compile/      # normalised workflow and execution plan
-├── graph/        # workflow graph in several formats
+├── graph/        # logical graph in several formats
 ├── render/       # rendering specifications
 ├── reports/      # diagnostics and provenance reports
 └── run_summary.yaml
 ```
 
-The `artifacts/` directory contains user-facing analysis outputs such as plots, histograms, cutflows, tables, and provenance records.
+These files expose the intermediate representations and records that Flow
+normally uses internally.
 
-The `compile/` and `graph/` directories expose how FAST-HEP interpreted and planned the workflow. These are particularly useful for inspecting, debugging, and validating an analysis.
+- `compile/` records the normalised workflow and execution plan.
+- `graph/` exposes the logical graph used to analyse data flow and dependencies.
+- `artifacts/` contains the scientific products of execution.
+- `reports/` contains diagnostics and provenance information.
+- `run_summary.yaml` summarises the completed execution.
 
-For a first run, the two most useful files are:
+This makes it possible to inspect not only the final result, but also how Flow
+understood, planned, and executed the workflow.
+
+For a first run, three particularly useful files are:
 
 ```text
-artifacts/plots/DiMuonMass.png
-graph/graph.svg
+artifacts/plots/DiMuonMass.png    # scientific result
+graph/graph.svg                   # logical graph
+compile/plan.yaml                 # execution plan
 ```
 
 ---
 
 ## Where next?
 
-You have now run a complete FAST-HEP analysis and seen both its scientific output and the workflow FAST-HEP constructed from its description.
+You have now run a complete FAST-HEP analysis and seen both its scientific
+output and the intermediate representations Flow constructed from the workflow
+description.
 
 Where to go next depends on what you want to explore:
 
 * **Build more realistic analyses:** continue with the [FAST-HEP workshop](https://fasthep-workshop.readthedocs.io/en/latest/) for guided tutorials and runnable examples.
-* **Understand the workflow language:** read about [Workflow language]({{< ref "/concepts/workflow-language.md" >}}) or explore the [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/) for the full workflow model, compilation, planning, and execution.
+* **Write your own workflows:** read about [Workflow language]({{< ref "/concepts/workflow-language.md" >}}) to learn how `workflow.yaml` describes an analysis.
+* **Understand what Flow does with a workflow:** explore the [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/) for compilation, logical graphs,
+  execution planning, and runtime execution.
 * **Structure your own analysis:** see [Analysis repositories]({{< ref "/concepts/analysis-repositories.md" >}}).
 * **Explore the toolkit:** see [Packages]({{< ref "/packages/" >}}) for the components that make up FAST-HEP.
 
