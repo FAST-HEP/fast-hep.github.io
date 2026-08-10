@@ -4,135 +4,133 @@ title: "Workflow language"
 weight: 1
 ---------
 
-FAST-HEP analyses are typically described declaratively using an `author.yaml` file.
+FAST-HEP analyses begin with a workflow description, typically written as
+`workflow.yaml`.
 
-The author description captures **what data are available and what should be computed from them**, without requiring the user to prescribe every detail of execution.
+The workflow captures **what data are available and what scientific operations
+should be performed**, without requiring the author to prescribe how those
+operations are implemented or executed.
 
-`fasthep-flow` turns this description into an explicit execution plan:
+Flow compiles this description through a series of explicit representations:
 
 ```mermaid
 flowchart LR
-    Author["author.yaml<br/><b>analysis intent</b>"]
-    Normalised["normalised<br/>workflow"]
-    Graph["dependency<br/>graph"]
-    Plan["execution<br/>plan"]
-    Flow["fasthep-flow<br/><b>orchestration</b>"]
+    Workflow["<b>workflow.yaml</b><br/>scientific intent"]:::input
+    Normalised["<b>Normalised<br/>workflow</b>"]:::flow
+    Graph["<b>Logical<br/>graph</b>"]:::flow
+    Plan["<b>Execution<br/>plan</b>"]:::plan
+    Runtime["<b>Runtime</b>"]:::runtime
 
-    Author --> Normalised --> Graph --> Plan --> Flow
+    Workflow --> Normalised --> Graph --> Plan --> Runtime
 ```
 
 This separates three concerns:
 
-* **authoring** — how scientists describe an analysis
-* **compilation** — how that description becomes an executable plan
-* **orchestration** — how the plan is executed
+* **authoring** — describing the scientific workflow
+* **compilation** — validating and resolving that description into an execution plan
+* **execution** — orchestrating the resolved plan in a computing environment
 
-For most users, these layers work together transparently. Their separation allows each to evolve independently.
+For most users these layers work together transparently, but their separation
+allows each to evolve independently.
 
-The standard FAST-HEP author language and compiler are not required by the runtime: other tools can construct compatible execution plans and use `fasthep-flow` to execute them directly.
-
----
-
-## Describing an analysis
-
-An author workflow brings together the information needed to describe an analysis, such as:
-
-* datasets and data sources
-* derived quantities and selections
-* analysis operations
-* histograms and other data products
-* rendering and reporting
-* metadata and provenance
-
-The description does not need to prescribe how every operation is executed.
-
-For example, an analysis can request that a quantity is calculated from several input fields without specifying how events are partitioned, scheduled, or processed by the underlying execution system.
-
-This allows the scientific description of an analysis to remain relatively independent of its execution environment.
+The standard workflow language is itself replaceable. The runtime does not
+require `workflow.yaml`: another language or tool can construct a compatible
+execution plan and pass it directly to Flow's runtime.
 
 ---
 
-## Composable operations
+## Describing a workflow
 
-FAST-HEP is built around **replaceable operations with explicit contracts**.
+A workflow brings together the information needed to describe an analysis,
+including:
 
-`fasthep-flow` connects and orchestrates these operations, while the operations themselves provide the capabilities that read, transform, inspect, render, or write data.
+- datasets and data sources
+- derived quantities and selections
+- analysis operations
+- histograms and other data products
+- rendering and reporting
+- metadata and provenance configuration
+
+For example, a workflow may describe a derived quantity in terms of several
+input fields and request a histogram of the result. It does not need to specify
+which library implements the histogram, how events are partitioned, or where
+individual partitions are executed.
+
+The workflow therefore describes the **scientific structure** of the analysis
+rather than a sequence of framework-specific instructions.
+
+For the complete workflow syntax, see the
+[Flow workflow-language documentation](https://fasthep-flow.readthedocs.io/en/latest/overview/workflow-language.html).
+
+---
+
+## Operations are capabilities
 
 ```mermaid
-flowchart TD
-    Flow["<b>fasthep-flow</b><br/>orchestration"]
+flowchart LR
+    Source["<b>Source</b><br/>introduce data"]:::source
+    Transform["<b>Transform</b><br/>compute products"]:::transform
+    Observer["<b>Observer</b><br/>inspect"]:::observer
+    Sink["<b>Sink</b><br/>produce artifacts"]:::sink
 
-    Source["source<br/><b>read data</b>"]
-    Transform["transform<br/><b>process data</b>"]
-    Observer["observer<br/><b>inspect data</b>"]
-    Sink["sink<br/><b>produce output</b>"]
-
-    Flow --> Source
-    Flow --> Transform
-    Flow --> Observer
-    Flow --> Sink
+    Source --> Transform
+    Transform --> Sink
+    Transform -.-> Observer
 ```
 
-FAST-HEP provides implementations for common use cases:
+The workflow describes operations by their capabilities rather than embedding
+their implementations directly into Flow.
 
-* `fasthep-carpenter` provides HEP-oriented data processing operations
-* `fasthep-curator` provides inspection, metadata, and provenance capabilities
-* `fasthep-render` provides plotting and reporting operations
+During compilation, registered operation specifications describe what
+operations require and provide. Concrete implementations are resolved separately and can come
+from FAST-HEP packages, experiment-specific packages, or the analysis itself. See [Operations and specs]({{< ref "operations-and-specs.md" >}}) and
+[Profiles and registries]({{< ref "profiles-and-registries.md" >}})
+for more information.
 
-These implementations are not intrinsic to the workflow engine. Projects, experiments, or individual analyses can replace them or provide entirely new operations.
+FAST-HEP currently provides common capabilities through:
 
-As long as an operation satisfies the relevant workflow contract, Flow can orchestrate it without needing to understand its internal implementation.
+- `fasthep-carpenter` — reading, writing, transforms, selections, and aggregation
+- `fasthep-curator` — inspection, diagnostics, metadata, and provenance
+- `fasthep-render` — plotting, reporting, and visualisation
 
-**Everything that interacts with scientific data can therefore evolve independently of the orchestration layer.** Implementations can change as requirements, data formats, software libraries, or computing hardware change without redesigning the workflow engine.
+This means that changing a reader, output format, histogram implementation, or
+other capability does not require changing Flow's core machinery.
+See [Operations and specs]({{< ref "operations-and-specs.md" >}}) for more information.
 
-The operation contracts and registration mechanisms are described in detail in the [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
 ---
 
 ## Inspectable workflows
 
-Compilation gives FAST-HEP an explicit representation of the analysis before it is executed.
+The workflow description is intentionally concise for authors. Compilation
+turns that description into explicit intermediate representations that can be
+inspected before execution.
 
-This makes it possible to inspect:
+These representations expose:
 
-* which operations will run
-* what each operation depends on
-* how data flow between operations
-* what outputs will be produced
-* which capabilities the analysis requires
+- which operations will run
+- what each operation requires and provides
+- how data flow between operations
+- which implementations have been resolved
+- what artifacts are expected
 
-These representations support validation, debugging, provenance, visualisation, and alternative execution environments.
+This supports early validation, debugging, visualisation, provenance, and
+alternative execution strategies.
 
-The workflow graph generated in the [Getting started]({{< ref "/getting-started/" >}}) example is one representation of this compiled analysis structure.
+The logical graph generated in the
+[Getting started]({{< ref "/getting-started/" >}}) example is one such
+representation. See [Compilation and execution]({{< ref "compilation-and-execution.md" >}}) for the complete process.
 
-For an overview of the individual compilation stages, see [Compilation and Execution]({{< ref "compilation-and-execution.md" >}}).
-
----
-
-## Execution
-
-The execution plan is also separated from the system that runs it.
-
-An analysis should not generally need to change simply because it moves from a local machine to a distributed computing environment or different computing hardware.
-
-Execution environments determine how the compiled plan is run, while the workflow continues to describe the scientific computation.
-
-See [Execution environments]({{< ref "execution-environments.md" >}}) for an overview.
+The resulting execution plan is backend-independent. See
+[Execution environments]({{< ref "execution-environments.md" >}}) for how the
+same plan can be mapped onto local, distributed, and heterogeneous computing
+resources.
 
 ---
 
 ## Learn more
 
-This page describes the role of the workflow language within FAST-HEP rather than its complete syntax.
+This page introduces the role and design of the workflow language. For the
+complete syntax and reference documentation, see the
+[fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
-For the current language specification, operation contracts, profiles, and detailed technical documentation, see the [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
-
-For runnable analyses and guided tutorials, see the [FAST-HEP workshop](https://fasthep-workshop.readthedocs.io/en/latest/).
-
-### Related concepts
-
-* [Compilation and execution]({{< ref "compilation-and-execution.md" >}})
-* [Operations and specs]({{< ref "operations-and-specs.md" >}})
-* [Profiles and registries]({{< ref "profiles-and-registries.md" >}})
-* [Execution environments]({{< ref "execution-environments.md" >}})
-* [Analysis repositories]({{< ref "analysis-repositories.md" >}})

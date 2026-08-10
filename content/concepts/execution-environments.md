@@ -4,91 +4,117 @@ title: "Execution environments"
 weight: 5
 ---------
 
-FAST-HEP separates the scientific description of an analysis from the environment in which it executes.
+FAST-HEP separates the scientific description of an analysis from the
+infrastructure used to execute it.
 
-The workflow describes **what should be computed**. The execution layer determines **how and where that computation runs**.
+The workflow describes **what should be computed**. Compilation turns that
+description into a backend-independent execution plan, while the execution
+layer determines **how and where that plan runs**.
+
+This separation allows the same scientific workflow and execution plan to move
+between computing environments without encoding scheduling or infrastructure
+details into the workflow itself.
 
 ```mermaid
 flowchart LR
-    Workflow["workflow<br/><b>scientific intent</b>"]
-    Plan["execution plan"]
-    Execution["execution environment"]
-    Resources["computing resources"]
+    Workflow["<b>workflow.yaml</b><br/>scientific workflow"]:::input
+    Plan["<b>Execution plan</b><br/>backend-independent"]:::plan
+    Runtime["<b>Runtime</b><br/>common semantics"]:::runtime
+    Resources["<b>Computing resources</b><br/>local, batch, distributed"]:::capability
 
-    Workflow --> Plan --> Execution --> Resources
+    Workflow --> Plan --> Runtime --> Resources
 ```
 
-This separation allows the same analysis to move between execution environments without encoding scheduling or infrastructure details into the scientific workflow.
 
 ---
 
 ## Execution as a replaceable capability
 
-Flow orchestrates the operations in an execution plan, but does not require them to run in one particular computing environment.
+Flow's runtime defines the common semantics for executing an execution plan.
+Backends decide how those semantics are mapped onto computing resources.
 
-Execution may differ in how work is:
+Execution environments can differ in how work is:
 
-* partitioned
-* scheduled
-* distributed
-* assigned to computing resources
-* prepared for specialised hardware
+- scheduled
+- distributed
+- assigned to workers or batch resources
+- configured with resource requirements
+- prepared for specialised hardware
 
-The current FAST-HEP implementation supports local execution and Dask-based distributed execution.
+The current FAST-HEP implementation supports local execution and Dask-based
+distributed execution.
 
-The execution interfaces are designed so that additional environments can be integrated without changing the meaning of the analysis workflow.
+Backend and strategy selection are deliberately separate from the scientific
+workflow. The same plan can therefore be executed in different environments
+without changing the meaning of the analysis.
 
 ---
 
 ## Distributed execution
 
-For distributed analyses, FAST-HEP uses Dask to execute work across multiple workers.
+For distributed workflows, FAST-HEP can use Dask as the execution backend.
 
-The workers themselves may be provided by different computing infrastructures:
+Dask separates task execution from worker provisioning. The same Flow
+execution plan can therefore run on workers started locally or provided by
+larger computing infrastructures.
 
 ```mermaid
 flowchart TD
-    Plan["FAST-HEP<br/>execution plan"]
-    Dask["Dask"]
-    Local["local workers"]
-    Batch["batch resources"]
-    Grid["distributed / grid resources"]
+    Plan["<b>Execution plan</b>"]:::plan
+    Runtime["<b>Flow runtime</b>"]:::runtime
+    Dask["<b>Dask backend</b>"]:::runtime
 
-    Plan --> Dask
+    Local["<b>Local workers</b>"]:::capability
+    Batch["<b>Batch provisioning</b><br/>HTCondor / Slurm"]:::capability
+    Future["<b>Future provisioning</b><br/>WLCG / other resources"]:::capability
+
+    Plan --> Runtime --> Dask
     Dask --> Local
     Dask --> Batch
-    Dask --> Grid
+    Dask --> Future
 ```
 
-This provides another separation: the analysis does not need to know how the workers used to execute it were provisioned.
+The worker-provisioning strategy is independent of the scientific workflow.
+For example, Dask can run with local workers or act as a gateway to batch
+systems such as HTCondor or Slurm.
 
-Support for additional distributed computing environments is under active development.
+This makes it possible to change computing infrastructure without introducing
+batch-system concepts into the analysis description.
 
 ---
 
 ## Specialised execution
 
-Some execution behaviour is provided through the same extension mechanisms used elsewhere in FAST-HEP.
+Some runtime behaviour can be added through execution modifiers.
 
-For example, execution modifiers can prepare operations or workers for specialised execution environments such as GPUs.
+Execution modifiers participate at defined runtime boundaries without changing
+the scientific operation itself. They can be used for behaviour such as
+preloading data onto a GPU, preparing device-specific state, or JIT-compiling
+an operation before repeated execution.
 
-This means that changing computing hardware does not necessarily require a different scientific operation or workflow description.
+This allows runtime experiments and hardware-specific preparation to be added
+without accumulating execution flags or infrastructure logic in the workflow
+description.
 
-Instead, implementations and execution behaviour can be selected or extended while preserving the operation contracts understood by Flow.
-
-This is another consequence of the FAST-HEP principle that the components underneath a workflow should remain replaceable.
+The selected operation implementation may still be hardware-specific; the
+important boundary is that these choices remain separate from the scientific
+workflow contract.
 
 ---
 
 ## Portability and reproducibility
 
-Separating workflow semantics from execution makes analyses more portable, but execution choices can still affect how a workflow was run.
+Separating workflow semantics from execution improves portability, but
+execution conditions remain part of the scientific record.
 
-FAST-HEP therefore treats execution information as part of the wider provenance of an analysis.
+FAST-HEP therefore treats execution metadata as part of workflow provenance.
+Current provenance records can include software versions, execution
+configuration, host and platform information, partitions, and producer
+executions.
 
-Recording information about the resolved operations, software environment, execution configuration, and computing resources is important for reproducing and debugging workflow executions.
-
-Provenance support for some of this information is still under development.
+For distributed workflows this becomes more important, because different
+partitions may execute on heterogeneous workers. Recording worker-level
+software and hardware conditions is an area of ongoing development.
 
 ---
 
@@ -96,7 +122,9 @@ Provenance support for some of this information is still under development.
 
 This page describes the role of execution environments in the FAST-HEP architecture.
 
-For the current execution interfaces, Dask integration, runtime configuration, and backend-specific options, see the [`fasthep-flow` documentation](https://fasthep-flow.readthedocs.io/en/latest/).
+For the current backend interfaces, Dask integration, runtime configuration,
+execution strategies, and backend-specific options, see the
+[fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
 ### Related concepts
 

@@ -4,29 +4,34 @@ title: "Analysis repositories"
 weight: 6
 ---
 
-FAST-HEP encourages analyses to be structured as installable Python packages.
+FAST-HEP encourages analysis-specific Python code to live in an installable
+Python package.
 
-This provides a natural place for:
+An analysis repository can then bring together:
 
-* workflow descriptions
-* analysis-specific operations
-* profiles and registries
-* configuration
-* tests
-* documentation
+- workflow descriptions
+- analysis-specific operations
+- profiles and registries
+- configuration
+- tests
+- documentation
 
-and makes analysis code identifiable as a versioned software component.
+while giving the analysis-specific code a clear identity as a versioned
+software component.
 
 ```mermaid
 flowchart LR
-    Analysis["analysis repository"]
-    Package["installable<br/>Python package"]
-    Profile["analysis profile"]
-    Workflow["FAST-HEP workflow"]
+    Repository["<b>Analysis repository</b>"]:::input
+    Workflow["<b>workflow.yaml</b><br/>scientific workflow"]:::input
+    Package["<b>Python package</b><br/>analysis capabilities"]:::capability
+    Profile["<b>Analysis profile</b><br/>compose environment"]:::capability
+    Flow["<b>Flow</b><br/>compile + execute"]:::flow
 
-    Analysis --> Package
+    Repository --> Workflow
+    Repository --> Package
     Package --> Profile
-    Profile --> Workflow
+    Workflow --> Flow
+    Profile --> Flow
 ```
 
 This is particularly important for reproducibility: analysis-specific code is part of the software environment that produced a scientific result.
@@ -39,7 +44,7 @@ A FAST-HEP analysis might use a structure such as:
 
 ```text
 my-analysis/
-├── author.yaml
+├── workflow.yaml
 ├── pyproject.toml
 ├── README.md
 ├── src/
@@ -76,9 +81,9 @@ These capabilities can use the same registry and profile mechanisms as the rest 
 
 ```mermaid
 flowchart TD
-    HEP["hep profile"]
-    Experiment["experiment profile"]
-    Analysis["analysis profile"]
+    HEP["<b>HEP profile</b><br/>FAST-HEP capabilities"]:::capability
+    Experiment["<b>Experiment profile</b><br/>experiment capabilities"]:::capability
+    Analysis["<b>Analysis profile</b><br/>analysis-specific capabilities"]:::capability
 
     HEP --> Experiment --> Analysis
 ```
@@ -106,31 +111,38 @@ This makes it easier to:
 
 For FAST-HEP, this also supports provenance.
 
-As workflow capabilities are resolved, FAST-HEP can associate implementations with the packages that provided them. Recording those package identities and versions can then help reconstruct the software environment used for a particular execution.
-
+Current provenance records already capture software versions associated with a
+workflow execution. As provenance support develops further, resolved
+implementations can be associated more directly with the packages that
+provided them, making it possible to reconstruct not only the requested
+workflow but the concrete software components used to execute it.
 Support for collecting this information automatically as part of FAST-HEP provenance is under development.
 
 ---
 
 ## Reproducibility
 
-A reproducible analysis requires more than preserving its `author.yaml`.
+A reproducible analysis requires more than preserving its `workflow.yaml`.
 
 The workflow may refer to operations provided by:
 
-```text
-FAST-HEP packages
-        +
-experiment packages
-        +
-analysis package
+```mermaid
+flowchart TD
+    FASTHEP["<b>FAST-HEP packages</b>"]:::capability
+    Experiment["<b>Experiment packages</b>"]:::capability
+    Analysis["<b>Analysis package</b>"]:::capability
+    Environment["<b>Executable scientific environment</b>"]:::runtime
+
+    FASTHEP --> Environment
+    Experiment --> Environment
+    Analysis --> Environment
 ```
 
-Together, these form part of the executable scientific environment.
+Together, these packages form part of the executable scientific environment.
 
-Packaging analysis-specific code makes those dependencies explicit and gives provenance tooling something concrete to identify and record.
-
-This complements the FAST-HEP architecture described in the preceding concept pages: implementations are deliberately replaceable, so reproducibility requires knowing **which implementations were actually used**.
+Because FAST-HEP deliberately allows implementations to be replaced, preserving
+the workflow alone is insufficient for reproducibility: it is also necessary
+to know **which implementations and software versions were actually used**.
 
 ---
 

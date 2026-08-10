@@ -3,45 +3,57 @@
 title: "Compilation and execution"
 weight: 2
 ---
+FAST-HEP separates the description of an analysis from the infrastructure used
+to execute it.
 
-FAST-HEP separates the description of an analysis from its execution.
-
-The standard FAST-HEP workflow starts with an `author.yaml` file, which is compiled into an explicit execution plan before scientific data are processed.
+A standard FAST-HEP workflow begins with `workflow.yaml`. Flow compiles this
+description into a backend-independent execution plan before scientific data
+are processed.
 
 ```mermaid
 flowchart LR
-    Author["author.yaml<br/><b>analysis intent</b>"]
-    Compile["compilation"]
-    Plan["execution plan"]
-    Flow["Flow<br/><b>orchestration</b>"]
-    Outputs["artifacts<br/>and outputs"]
+    Workflow["<b>workflow.yaml</b><br/>scientific workflow"]:::input
+    Compile["<b>Compilation</b><br/>normalise, analyse,<br/>validate, plan"]:::flow
+    Plan["<b>Execution plan</b><br/>backend-independent"]:::plan
+    Runtime["<b>Runtime</b><br/>orchestration"]:::runtime
+    Outputs["<b>Artifacts</b><br/>results + provenance"]:::artifact
 
-    Author --> Compile --> Plan --> Flow --> Outputs
+    Workflow --> Compile --> Plan --> Runtime --> Outputs
 ```
 
-The **execution plan** forms an important boundary in the architecture.
+The **execution plan** forms a central architectural boundary.
 
-Everything before it is concerned with understanding and compiling the analysis description. Everything after it is concerned with orchestrating the operations described by that plan.
+Everything before it is concerned with understanding, validating, and planning
+the workflow. Everything after it is concerned with executing that resolved
+plan on a chosen computing environment.
 
 ---
 
 ## Compilation
 
-The author description is designed primarily for scientists. It can be concise, use convenient authoring constructs, and refer to operations by their registered names.
+The workflow description is designed primarily for scientists. It can remain
+concise, use convenient authoring constructs, and refer to capabilities by
+registered names.
 
-During compilation, FAST-HEP progressively turns this description into a more explicit representation of the workflow.
+Compilation progressively turns this description into representations that are
+more explicit and suitable for validation and execution.
 
-This includes tasks such as:
+The current compilation pipeline includes:
 
-* validating and normalising the description
-* resolving available capabilities
-* determining dependencies between operations
-* constructing the workflow graph
-* producing an executable plan
+- **normalisation** — assemble includes and defaults into one workflow
+- **logical graph construction** — lower the workflow into sources, transforms,
+  observers, sinks, and their data-flow relationships
+- **dependency analysis** — determine what operations require and provide,
+  validate schemas, and derive source projections
+- **dataset inspection** — collect source metadata needed for validation and planning
+- **execution planning** — create partitions, resolve lifecycle behaviour, and
+  produce the backend-independent execution plan
 
-These steps happen before the analysis data are processed.
+These steps happen before event processing begins.
 
-The intermediate representations can also be inspected, which helps with validation and debugging.
+The intermediate representations are deliberately inspectable. They support
+validation, debugging, visualisation, compiler extensions, and tooling without
+requiring the runtime to rediscover workflow semantics.
 
 The precise compilation stages and intermediate representations are documented by [`fasthep-flow`](https://fasthep-flow.readthedocs.io/en/latest/).
 
@@ -49,36 +61,55 @@ The precise compilation stages and intermediate representations are documented b
 
 ## The execution plan
 
-The execution plan describes the operations that need to run and how they relate to one another.
+The execution plan is the resolved description of what should execute.
 
-Flow consumes this plan and orchestrates its execution.
+It records the graph nodes and their inputs, selected implementations, dataset
+partitions, lifecycle behaviour, merge and materialisation policies, registry
+information, and execution configuration required by the runtime.
 
-Crucially, Flow does not require the plan to have originated from the standard FAST-HEP author language:
+The plan describes **what** should happen while remaining independent of
+**where** its partitions are eventually executed.
+
+Crucially, Flow does not require the plan to have originated from the standard FAST-HEP workflow language:
 
 ```mermaid
 flowchart LR
-    Author["FAST-HEP<br/>author.yaml"] --> Compiler["FAST-HEP<br/>compiler"]
-    Other["alternative<br/>authoring tools"] --> OtherCompiler["alternative<br/>compiler"]
+    Workflow["<b>workflow.yaml</b>"]:::input
+    Compiler["<b>Flow compiler</b>"]:::flow
 
-    Compiler --> Plan["execution plan"]
-    OtherCompiler --> Plan
+    Other["<b>Alternative frontend</b><br/>or workflow generator"]:::input
+    OtherCompiler["<b>Alternative compiler</b>"]:::flow
 
-    Plan --> Flow["Flow"]
+    Plan["<b>Execution plan</b>"]:::plan
+    Runtime["<b>Flow runtime</b>"]:::runtime
+
+    Workflow --> Compiler --> Plan
+    Other --> OtherCompiler --> Plan
+    Plan --> Runtime
 ```
 
-This means alternative authoring interfaces, workflow generators, or compilation tools can use Flow without adopting `author.yaml`, provided they produce a compatible execution plan.
+Flow's runtime does not require the plan to have originated from the standard
+workflow language. Alternative frontends, workflow generators, or compilation
+tools can use the runtime directly if they produce a compatible execution plan.
 
 ---
 
 ## Runtime execution
 
-At runtime, Flow orchestrates the operations represented by the plan.
+At runtime, Flow loads the execution plan, constructs the execution context,
+resolves the registered implementations and runtime hooks, and executes the
+active graph nodes for each partition.
 
-The execution system is deliberately separated from the scientific implementations themselves. Flow coordinates operations through defined contracts rather than owning the code that reads, transforms, or writes scientific data.
+The runtime engine defines the common execution semantics. Backends determine
+how those semantics are mapped onto computing resources.
 
-This allows both the **operations** and the **execution environment** to evolve independently of the authoring layer.
+For example, the same execution plan can be run locally or through a Dask
+backend without changing the scientific workflow. Backend, strategy, scheduler,
+worker, and resource choices can be recorded in the plan or overridden when the
+plan is executed.
 
-For example, the same analysis description can potentially be executed using different computing resources without encoding those details into the scientific workflow.
+This separation allows the scientific workflow, operation implementations, and
+computing infrastructure to evolve independently.
 
 See [Execution environments]({{< ref "execution-environments.md" >}}) for more about this separation.
 
@@ -93,7 +124,6 @@ The [Getting started]({{< ref "/getting-started/" >}}) example produces, among o
 ```text
 compile/
 ├── normalized.yaml
-├── deps.yaml
 ├── plan.yaml
 └── ...
 
@@ -101,11 +131,37 @@ graph/
 ├── graph.svg
 ├── graph.json
 └── ...
+
+run_summary.yaml
 ```
 
-These artifacts allow users and tools to inspect what FAST-HEP understood from the original analysis description and what it planned to execute.
+These files expose how Flow interpreted, analysed, planned, and ultimately executed the workflow.
 
-For most users, understanding the individual compiler representations is not necessary. They are available when deeper inspection, debugging, validation, or tooling requires them.
+- `normalized.yaml` records the assembled workflow after normalisation.
+- the logical graph exposes the data-flow structure used during compiler
+  analysis.
+- `plan.yaml` records the backend-independent execution plan.
+- `run_summary.yaml` records what was actually processed and which runtime
+  features were active.
+
+For most users, understanding the individual compiler representations is not
+necessary. They become useful when deeper inspection, debugging, validation,
+or tooling is required.
+
+---
+
+## Extending compilation
+
+Compilation is not limited to behaviour implemented inside Flow. External
+packages can contribute compiler extensions that inspect or augment compiler
+representations and produce additional artifacts.
+
+Examples include dataset inspection provided by Curator and graph visualisation provided by Render.
+The same mechanism can support additional analyses,
+metadata providers, or alternative workflow frontends without embedding those
+features in Flow's core compiler.
+
+See the [Flow documentation](https://fasthep-flow.readthedocs.io/en/latest/extending/compile-hooks.html) for the current compiler-extension interfaces.
 
 ---
 
@@ -113,7 +169,9 @@ For most users, understanding the individual compiler representations is not nec
 
 This page describes why FAST-HEP separates compilation from execution.
 
-For the technical specification of the compiler, intermediate representations, planning process, and runtime, see the [`fasthep-flow` documentation](https://fasthep-flow.readthedocs.io/en/latest/).
+For the technical specification of compiler stages, intermediate
+representations, planning, runtime execution, and compiler extensions, see the
+[fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
 
 ### Related concepts
 
