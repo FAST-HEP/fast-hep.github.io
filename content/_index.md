@@ -34,7 +34,7 @@ FAST-HEP is developed for HEP analysis, while several of its underlying componen
 
 ## Toolkit overview
 
-FAST-HEP is built from focused packages connected through stable contracts.
+FAST-HEP is built from focused packages connected through explicit contracts.
 Flow provides the general workflow, compilation, planning, and orchestration
 machinery. Other packages register capabilities that can participate in
 compilation and execution without becoming part of Flow itself.
@@ -78,6 +78,12 @@ changes throughout the framework.
 **A note on naming:** `fasthep-flow` is referred to as **Flow** throughout this documentation. In Python, it is imported as `hepflow`.
 {{< /admonition >}}
 
+{{< admonition warning >}}
+FAST-HEP is in alpha development. The architecture is settling, but the
+workflow syntax and some extension and runtime interfaces remain pre-stable.
+Check the documentation for the package version you are using.
+{{< /admonition >}}
+
 
 ---
 
@@ -92,6 +98,7 @@ The FAST-HEP toolkit currently includes:
 | `fasthep-curator`   | Inspection, diagnostics, metadata, and provenance                         |
 | `fasthep-render`    | Plotting, reports, and visualisation                                      |
 | `fasthep-cli`       | Unified command-line interface                                            |
+| `fasthep-distributed` | Dask, HTCondor, worker environments, and distributed execution          |
 | `fasthep-toolbench` | Shared, domain-independent utilities                                      |
 | `fasthep-workshop`  | Tutorials, examples, and training material                                |
 | `fasthep`           | Meta-package for installing the FAST-HEP toolkit                          |
@@ -110,6 +117,9 @@ pip install "fasthep[hep]"
 For tutorials and reproducible example environments, the workshop material uses [Pixi](https://pixi.sh/).
 
 For development across the full toolkit, see [`fasthep-dev`](https://github.com/FAST-HEP/fasthep-dev).
+
+Distributed execution is provided separately by `fasthep-distributed`; it is
+not currently included in the `fasthep[hep]` installation bundle.
 
 ---
 

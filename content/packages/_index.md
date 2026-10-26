@@ -23,15 +23,17 @@ flowchart TD
     Carpenter["<b>Carpenter</b><br/>HEP data processing"]:::capability
     Curator["<b>Curator</b><br/>inspection + provenance"]:::capability
     Render["<b>Render</b><br/>visualisation + reports"]:::capability
+    Distributed["<b>Distributed</b><br/>Dask + HTCondor execution"]:::capability
 
     CLI --> Flow
 
     Carpenter -.->|"registered capabilities"| Flow
     Curator -.->|"registered capabilities"| Flow
     Render -.->|"registered capabilities"| Flow
+    Distributed -.->|"backend implementation"| Flow
 ```
 
-Flow provides the workflow compilation, planning, and runtime machinery. Carpenter, Curator, Render, and external packages contribute capabilities through registries and stable contracts.
+Flow provides the workflow compilation, planning, and runtime machinery. Carpenter, Curator, Render, Distributed, and external packages contribute capabilities through registries and explicit contracts.
 
 This is not a closed set: experiments, projects, and individual analyses can provide capabilities through the same interfaces.
 
@@ -126,6 +128,28 @@ The CLI provides a common interface to capabilities and workflows provided by th
 
 ---
 
+### `fasthep-distributed`
+
+**Distributed** implements distributed execution capabilities against Flow's
+backend contract.
+
+It currently provides:
+
+* Dask execution of partitioned Flow plans
+* local Dask workers
+* HTCondor worker provisioning through `dask-jobqueue`
+* worker environments, staging, resource pools, and output-delivery checks
+
+Flow owns the backend-neutral execution semantics and the local baseline.
+Distributed owns the infrastructure-specific implementation. Dask-to-HTCondor
+has been exercised successfully through Flow at CERN lxplus. Slurm provisioning
+is available at the Dask layer, but it is not yet enabled or site-tested as a
+Flow execution route.
+
+[GitHub](https://github.com/FAST-HEP/fasthep-distributed)
+
+---
+
 ## Installation and supporting packages
 
 ### `fasthep`
@@ -139,6 +163,10 @@ pip install "fasthep[hep]"
 ```
 
 It provides curated combinations of FAST-HEP packages so users do not need to manage the toolkit components individually.
+
+The base `fasthep` package intentionally installs no capability stack. Use
+`fasthep[basic]` for Flow and the CLI or `fasthep[hep]` for the HEP analysis
+stack. Install `fasthep-distributed` separately when Dask execution is needed.
 
 ---
 
@@ -174,7 +202,9 @@ Most FAST-HEP users do not need `fasthep-dev`.
 
 ## Which package should I use?
 
-For most users, the answer is simply **FAST-HEP as a whole**: install the `fasthep` meta package and use the `fasthep` command-line interface.
+For most HEP users, the answer is **FAST-HEP as a whole**: install
+`fasthep[hep]` and use the `fasthep` command-line interface. A smaller
+Flow-and-CLI environment is available as `fasthep[basic]`.
 
 Individual packages become relevant when you want to go deeper:
 
@@ -185,6 +215,7 @@ Individual packages become relevant when you want to go deeper:
 | inspect data or work with metadata and provenance | `fasthep-curator`   |
 | create plots and reports                          | `fasthep-render`    |
 | understand or extend the command-line interface   | `fasthep-cli`       |
+| execute plans with Dask or provision HTCondor workers | `fasthep-distributed` |
 | learn FAST-HEP through runnable examples          | `fasthep-workshop`  |
 | develop several FAST-HEP packages together        | `fasthep-dev`       |
 

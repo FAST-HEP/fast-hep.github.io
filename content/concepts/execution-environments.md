@@ -65,18 +65,21 @@ flowchart TD
     Dask["<b>Dask backend</b>"]:::runtime
 
     Local["<b>Local workers</b>"]:::capability
-    Batch["<b>Batch provisioning</b><br/>HTCondor / Slurm"]:::capability
-    Future["<b>Future provisioning</b><br/>WLCG / other resources"]:::capability
+    Batch["<b>Validated route</b><br/>HTCondor at CERN lxplus"]:::capability
+    Future["<b>Not yet enabled in Flow</b><br/>Slurm / other facilities"]:::capability
 
     Plan --> Runtime --> Dask
     Dask --> Local
     Dask --> Batch
-    Dask --> Future
+    Dask -.-> Future
 ```
 
 The worker-provisioning strategy is independent of the scientific workflow.
-For example, Dask can run with local workers or act as a gateway to batch
-systems such as HTCondor or Slurm.
+For example, the current implementation can run with local Dask workers or
+provision workers through HTCondor. The Dask-to-HTCondor route has been tested
+successfully through Flow at CERN lxplus. Slurm provisioning is available
+through Dask, but the corresponding Flow route has not yet been enabled or
+site-tested.
 
 This makes it possible to change computing infrastructure without introducing
 batch-system concepts into the analysis description.
@@ -122,9 +125,11 @@ software and hardware conditions is an area of ongoing development.
 
 This page describes the role of execution environments in the FAST-HEP architecture.
 
-For the current backend interfaces, Dask integration, runtime configuration,
-execution strategies, and backend-specific options, see the
+For backend-neutral interfaces and runtime configuration, see the
 [fasthep-flow documentation](https://fasthep-flow.readthedocs.io/en/latest/).
+For the current Dask and HTCondor implementation, worker environments, staging,
+and site-sensitive options, see
+[`fasthep-distributed`](https://github.com/FAST-HEP/fasthep-distributed).
 
 ### Related concepts
 

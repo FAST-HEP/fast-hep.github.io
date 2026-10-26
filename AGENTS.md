@@ -101,6 +101,7 @@ Link to package-owned documentation and repositories for details:
   <https://github.com/FAST-HEP/fasthep-render>
 - CLI: <https://fasthep-cli.readthedocs.io/en/latest/> and
   <https://github.com/FAST-HEP/fasthep-cli>
+- Distributed: <https://github.com/FAST-HEP/fasthep-distributed>
 - Workshop: <https://fasthep-workshop.readthedocs.io/en/latest/> and
   <https://github.com/FAST-HEP/fasthep-workshop>
 - Metapackage and contribution guide:
