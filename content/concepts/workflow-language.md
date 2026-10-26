@@ -90,7 +90,7 @@ for more information.
 FAST-HEP currently provides common capabilities through:
 
 - `fasthep-carpenter` — reading, writing, transforms, selections, and aggregation
-- `fasthep-curator` — inspection, diagnostics, metadata, and provenance
+- `fasthep-curator` — inspection, validation, diagnostics, and provenance evidence
 - `fasthep-render` — plotting, reporting, and visualisation
 
 This means that changing a reader, output format, histogram implementation, or

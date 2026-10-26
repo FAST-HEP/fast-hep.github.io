@@ -129,6 +129,35 @@ See [Profiles and registries]({{< ref "profiles-and-registries.md" >}}) for an o
 
 ---
 
+## Extension seams beyond graph operations
+
+Sources, transforms, observers, and sinks participate directly in the workflow
+graph. Flow also exposes extension seams around compilation, execution, and
+product handling:
+
+| If a capability needs to... | Extension seam |
+|---|---|
+| introduce data or another product | [source](https://fasthep-flow.readthedocs.io/en/latest/extending/sources.html) |
+| compute or transform a product | [transform](https://fasthep-flow.readthedocs.io/en/latest/extending/transforms.html) |
+| inspect a product in the graph | [observer](https://fasthep-flow.readthedocs.io/en/latest/extending/observers.html) |
+| consume products to write or render output | [sink](https://fasthep-flow.readthedocs.io/en/latest/extending/sinks.html) |
+| inspect or augment compilation | [compile hook](https://fasthep-flow.readthedocs.io/en/latest/extending/compile-hooks.html) |
+| receive runtime lifecycle, result, or error events | [execution hook](https://fasthep-flow.readthedocs.io/en/latest/extending/execution-hooks.html) |
+| prepare or adapt operation execution | [execution modifier](https://fasthep-flow.readthedocs.io/en/latest/extending/execution-modifiers.html) |
+| map executable work onto infrastructure | [backend](https://fasthep-flow.readthedocs.io/en/latest/extending/backends.html) |
+| define merge or materialisation behaviour for a product type | [product handler](https://fasthep-flow.readthedocs.io/en/latest/execution/runtime.html#product-types-can-define-runtime-behaviour) |
+
+An **observer** is an operation in the graph: it inspects workflow products.
+An **execution hook** observes the runtime lifecycle around graph execution.
+Keeping these roles separate avoids turning scientific data inspection into
+implicit runtime instrumentation, or vice versa.
+
+These are public architectural seams, but their exact Python and YAML APIs are
+still evolving during alpha development. Flow's extension documentation owns
+the current interface details.
+
+---
+
 ## Learn more
 
 This page describes the role of operations and specs in the FAST-HEP architecture.

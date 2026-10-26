@@ -1,7 +1,7 @@
 ---
 
 title: "Execution environments"
-weight: 5
+weight: 6
 ---------
 
 FAST-HEP separates the scientific description of an analysis from the

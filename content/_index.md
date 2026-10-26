@@ -55,7 +55,7 @@ flowchart LR
     subgraph Capabilities["Registered capabilities"]
         direction TB
         Carpenter["<b>Carpenter</b><br/>read, transform,<br/>aggregate, write"]:::capability
-        Curator["<b>Curator</b><br/>inspect, diagnose,<br/>provenance"]:::capability
+        Curator["<b>Curator</b><br/>inspect, validate,<br/>record evidence"]:::capability
         Render["<b>Render</b><br/>plots, reports,<br/>visualisation"]:::capability
         Extensions["<b>Extensions</b><br/>custom capabilities"]:::capability
     end
@@ -95,7 +95,7 @@ The FAST-HEP toolkit currently includes:
 | ------------------- | ------------------------------------------------------------------------- |
 | `fasthep-flow`      | Workflow description, compilation, planning, orchestration, and execution |
 | `fasthep-carpenter` | Data readers and writers, HEP transforms, selections, and aggregation     |
-| `fasthep-curator`   | Inspection, diagnostics, metadata, and provenance                         |
+| `fasthep-curator`   | Inspection, validation, diagnostics, and metadata                |
 | `fasthep-render`    | Plotting, reports, and visualisation                                      |
 | `fasthep-cli`       | Unified command-line interface                                            |
 | `fasthep-distributed` | Dask, HTCondor, worker environments, and distributed execution          |

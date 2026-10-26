@@ -21,7 +21,7 @@ flowchart TD
     Flow["<b>Flow</b><br/>compile, plan,<br/>orchestrate"]:::flow
 
     Carpenter["<b>Carpenter</b><br/>HEP data processing"]:::capability
-    Curator["<b>Curator</b><br/>inspection + provenance"]:::capability
+    Curator["<b>Curator</b><br/>inspection + evidence"]:::capability
     Render["<b>Render</b><br/>visualisation + reports"]:::capability
     Distributed["<b>Distributed</b><br/>Dask + HTCondor execution"]:::capability
 
@@ -80,16 +80,19 @@ Carpenter provides these capabilities to Flow through registries and operation c
 
 ### `fasthep-curator`
 
-**Curator** provides inspection, metadata, provenance, and diagnostic capabilities.
+**Curator** provides machine-readable inspection, validation, diagnostic, and
+evidence-collection capabilities that enrich Flow's core provenance records.
 
 These include:
 
 * dataset and schema inspection
-* provenance collection
-* runtime diagnostics
-* inspection reports and diagnostics
+* schema snapshots and comparison
+* dataset-context and resource evidence
+* runtime warnings, errors, and resource-usage diagnostics
 
-Curator focuses on understanding and recording what happens around an analysis without owning its scientific transformations.
+Flow owns the core plan, run, artifact, and writer provenance records. Curator
+adds evidence that helps explain the data and execution environment without
+owning scientific transformations or human-readable presentation.
 
 [Documentation](https://fasthep-curator.readthedocs.io/en/latest/) · [GitHub](https://github.com/FAST-HEP/fasthep-curator)
 
@@ -212,7 +215,7 @@ Individual packages become relevant when you want to go deeper:
 | ------------------------------------------------- | ------------------- |
 | describe, compile, plan, or execute workflows     | `fasthep-flow`      |
 | read/write HEP data or add analysis operations    | `fasthep-carpenter` |
-| inspect data or work with metadata and provenance | `fasthep-curator`   |
+| inspect data or add validation and provenance evidence | `fasthep-curator` |
 | create plots and reports                          | `fasthep-render`    |
 | understand or extend the command-line interface   | `fasthep-cli`       |
 | execute plans with Dask or provision HTCondor workers | `fasthep-distributed` |
