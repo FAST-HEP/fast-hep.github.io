@@ -25,6 +25,12 @@ How Flow turns a workflow description into a logical graph and execution plan,
 and how that plan separates scientific workflow semantics from runtime
 execution.
 
+### [Graphs, variations, and products]({{< ref "graphs-variations-and-products.md" >}})
+
+How workflows branch and share computation, how systematic variations expand
+relevant paths, and how products move between partition, dataset, and global
+scope before becoming traceable artifacts.
+
 ### [Operations and specs]({{< ref "operations-and-specs.md" >}})
 
 How workflow operations expose their parameters, inputs, outputs, dependencies,

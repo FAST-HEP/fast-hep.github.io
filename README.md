@@ -1,14 +1,31 @@
+# FAST-HEP project site
+
+This repository builds the FAST-HEP project-level documentation at
+<https://fast-hep.github.io/>. Package reference documentation and runnable
+tutorials remain in their owning repositories.
+
 ## Building the site
 
-### Prerequisites
-- Hugo (extended version): https://gohugo.io/getting-started/installing/
-- Node.js: https://nodejs.org/en/download/
+Use the repository's Pixi environment:
 
-### Build
-1. Clone the repository
-2. Run `hugo server -D`
-3. Open http://localhost:1313/ in your browser
+```bash
+pixi install
+pixi run serve
+```
 
+The local preview is available at <http://localhost:1313/>. Build the
+production site with:
+
+```bash
+pixi run build --baseURL "https://fast-hep.github.io/"
+```
+
+The generated site is written to `public/`. Edit the sources under `content/`,
+`layouts/`, `assets/`, and `static/`; do not edit `public/` or
+`resources/_gen/` by hand.
 
 ## Theme
-This page uses the [Geekdocs](https://geekdocs.de/usage/getting-started/) theme.
+
+The site uses the
+[`scientific-python-hugo-theme`](https://github.com/scientific-python/scientific-python-hugo-theme),
+configured in `config.toml`.

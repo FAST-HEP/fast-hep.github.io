@@ -45,11 +45,18 @@ The current compilation pipeline includes:
   observers, sinks, and their data-flow relationships
 - **dependency analysis** — determine what operations require and provide,
   validate schemas, and derive source projections
-- **dataset inspection** — collect source metadata needed for validation and planning
+- **dataset analysis and partitioning** — turn dataset descriptions into the
+  explicit units of work needed by the plan
 - **execution planning** — create partitions, resolve lifecycle behaviour, and
   produce the backend-independent execution plan
 
 These steps happen before event processing begins.
+
+Extensions can contribute additional compile-time information. For example, a
+[compile hook can inspect ROOT metadata](https://github.com/FAST-HEP/fasthep-curator/blob/main/src/fasthep_curator/compile_hooks/root_tree_metadata.py) when a workflow needs evidence
+that is not already present in its dataset description. This external file
+inspection is optional extension behaviour rather than an unconditional stage
+of every Flow compilation.
 
 The intermediate representations are deliberately inspectable. They support
 validation, debugging, visualisation, compiler extensions, and tooling without

@@ -1,7 +1,7 @@
 ---
 
 title: "Analysis repositories"
-weight: 6
+weight: 7
 ---
 
 FAST-HEP encourages analysis-specific Python code to live in an installable
@@ -111,12 +111,14 @@ This makes it easier to:
 
 For FAST-HEP, this also supports provenance.
 
-Current provenance records already capture software versions associated with a
-workflow execution. As provenance support develops further, resolved
-implementations can be associated more directly with the packages that
-provided them, making it possible to reconstruct not only the requested
-workflow but the concrete software components used to execute it.
-Support for collecting this information automatically as part of FAST-HEP provenance is under development.
+Current compile bundles record installed distributions, editable-checkout
+revisions and dirty state, lock-file evidence, and the distributions that
+provided packaged registry or profile layers. The plan retains the resolved
+registry and implementation references used by the runtime.
+
+This already captures substantially more than the authored workflow alone.
+Collecting equivalent evidence from every distributed worker and external
+resource remains an area of ongoing development.
 
 ---
 

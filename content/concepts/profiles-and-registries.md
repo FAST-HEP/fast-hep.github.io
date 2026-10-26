@@ -88,12 +88,14 @@ The same composition mechanism is available to experiments and individual analys
 This allows customisation through composition rather than by modifying Flow or FAST-HEP packages directly.
 
 {{< admonition note >}}
-**Provenance and reproducibility:** FAST-HEP is being extended to record resolved
-capabilities, concrete implementations, and provider package versions in the
-workflow provenance. This will record not only what an analysis requested, but
-which software components actually executed it.
+**Provenance and reproducibility:** Flow records the resolved registry and
+profile layers in the compiled plan. Its compile bundle also records installed
+distributions, editable-checkout revisions and dirty state, lock-file evidence,
+and the distributions that supplied packaged registry or profile layers.
 
-This support is currently under development.
+This identifies the software environment and the selected implementations more
+precisely than the authored workflow alone. Worker-level and site-specific
+environment evidence continues to evolve, particularly for distributed runs.
 {{< /admonition >}}
 
 

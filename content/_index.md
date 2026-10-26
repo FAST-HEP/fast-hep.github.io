@@ -34,7 +34,7 @@ FAST-HEP is developed for HEP analysis, while several of its underlying componen
 
 ## Toolkit overview
 
-FAST-HEP is built from focused packages connected through stable contracts.
+FAST-HEP is built from focused packages connected through explicit contracts.
 Flow provides the general workflow, compilation, planning, and orchestration
 machinery. Other packages register capabilities that can participate in
 compilation and execution without becoming part of Flow itself.
@@ -55,7 +55,7 @@ flowchart LR
     subgraph Capabilities["Registered capabilities"]
         direction TB
         Carpenter["<b>Carpenter</b><br/>read, transform,<br/>aggregate, write"]:::capability
-        Curator["<b>Curator</b><br/>inspect, diagnose,<br/>provenance"]:::capability
+        Curator["<b>Curator</b><br/>inspect, validate,<br/>record evidence"]:::capability
         Render["<b>Render</b><br/>plots, reports,<br/>visualisation"]:::capability
         Extensions["<b>Extensions</b><br/>custom capabilities"]:::capability
     end
@@ -78,6 +78,12 @@ changes throughout the framework.
 **A note on naming:** `fasthep-flow` is referred to as **Flow** throughout this documentation. In Python, it is imported as `hepflow`.
 {{< /admonition >}}
 
+{{< admonition warning >}}
+FAST-HEP is in alpha development. The architecture is settling, but the
+workflow syntax and some extension and runtime interfaces remain pre-stable.
+Check the documentation for the package version you are using.
+{{< /admonition >}}
+
 
 ---
 
@@ -89,9 +95,10 @@ The FAST-HEP toolkit currently includes:
 | ------------------- | ------------------------------------------------------------------------- |
 | `fasthep-flow`      | Workflow description, compilation, planning, orchestration, and execution |
 | `fasthep-carpenter` | Data readers and writers, HEP transforms, selections, and aggregation     |
-| `fasthep-curator`   | Inspection, diagnostics, metadata, and provenance                         |
+| `fasthep-curator`   | Inspection, validation, diagnostics, and metadata                |
 | `fasthep-render`    | Plotting, reports, and visualisation                                      |
 | `fasthep-cli`       | Unified command-line interface                                            |
+| `fasthep-distributed` | Dask, HTCondor, worker environments, and distributed execution          |
 | `fasthep-toolbench` | Shared, domain-independent utilities                                      |
 | `fasthep-workshop`  | Tutorials, examples, and training material                                |
 | `fasthep`           | Meta-package for installing the FAST-HEP toolkit                          |
@@ -111,13 +118,20 @@ For tutorials and reproducible example environments, the workshop material uses 
 
 For development across the full toolkit, see [`fasthep-dev`](https://github.com/FAST-HEP/fasthep-dev).
 
+Distributed execution is provided separately by `fasthep-distributed`; it is
+not currently included in the `fasthep[hep]` installation bundle.
+
 ---
 
 ## Tutorials and examples
 
 The [`fasthep-workshop`](https://fasthep-workshop.readthedocs.io/en/latest/) provides runnable tutorials and example analyses.
 
-It develops a complete analysis from basic columnar data processing through workflow construction, custom operations, rendering, and execution on larger computing resources.
+The early tutorials build a small complete analysis from reading data through
+transformations, histograms, cutflows, and rendering. Later tutorials extend
+that foundation with saved datasets, provenance, systematic variations,
+workflow organisation, and selected distributed-execution paths. Further
+accelerator, extension, and complete case-study material is still being added.
 
 For a first introduction to FAST-HEP, this is the best place to start.
 
