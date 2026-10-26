@@ -131,11 +131,17 @@ build/examples/Zmumu/artifacts/plots/DiMuonMass.png
 
 It shows the reconstructed dimuon invariant-mass distribution, including the characteristic Z boson peak around 90 GeV.
 
-Flow also writes the logical graph:
+Flow also writes the logical graph in source and machine-readable formats, for
+example:
 
 ```text
-build/examples/Zmumu/graph/graph.svg
+build/examples/Zmumu/graph/graph.mmd
+build/examples/Zmumu/graph/graph.json
 ```
+
+When the optional D2 renderer is available, the same compilation also produces
+`build/examples/Zmumu/graph/graph.svg`. Graph inspection does not depend on the
+optional rendered image.
 
 For this analysis, the graph is approximately:
 
@@ -193,7 +199,7 @@ For a first run, three particularly useful files are:
 
 ```text
 artifacts/plots/DiMuonMass.png    # scientific result
-graph/graph.svg                   # logical graph
+graph/graph.json                  # logical graph
 compile/plan.yaml                 # execution plan
 ```
 

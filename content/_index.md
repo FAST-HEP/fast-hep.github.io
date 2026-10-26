@@ -127,7 +127,11 @@ not currently included in the `fasthep[hep]` installation bundle.
 
 The [`fasthep-workshop`](https://fasthep-workshop.readthedocs.io/en/latest/) provides runnable tutorials and example analyses.
 
-It develops a complete analysis from basic columnar data processing through workflow construction, custom operations, rendering, and execution on larger computing resources.
+The early tutorials build a small complete analysis from reading data through
+transformations, histograms, cutflows, and rendering. Later tutorials extend
+that foundation with saved datasets, provenance, systematic variations,
+workflow organisation, and selected distributed-execution paths. Further
+accelerator, extension, and complete case-study material is still being added.
 
 For a first introduction to FAST-HEP, this is the best place to start.
 

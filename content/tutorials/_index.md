@@ -4,9 +4,14 @@ title: "Tutorials"
 
 The [FAST-HEP workshop](https://fasthep-workshop.readthedocs.io/en/latest/) contains the runnable tutorials, examples, and training material for FAST-HEP.
 
-The tutorials are organised as a progressive analysis journey: starting with reading data and building simple quantities, then moving through analysis products, reusable workflows, distributed execution, accelerators, and custom extensions.
+The tutorials are organised as a progressive analysis journey. The first part
+reaches a small complete analysis: it reads data, derives and selects
+quantities, creates histograms and cutflows, and renders the results. Later
+material extends that working analysis with saved datasets, provenance,
+systematics, workflow organisation, distributed execution, and other advanced
+concerns.
 
-Each tutorial combines:
+Runnable tutorials combine:
 
 * a small runnable workflow
 * an explanation of the new concept being introduced
@@ -15,6 +20,10 @@ Each tutorial combines:
 
 The workshop uses reproducible [Pixi](https://pixi.sh/) environments, so examples can be run without assembling the FAST-HEP packages individually.
 
+Sections below are labelled **runnable**, **infrastructure-dependent**, or
+**planned**. A planned advanced section does not make the earlier analysis
+incomplete.
+
 [**Start the FAST-HEP workshop →**](https://fasthep-workshop.readthedocs.io/en/latest/)
 
 ---
@@ -22,6 +31,8 @@ The workshop uses reproducible [Pixi](https://pixi.sh/) environments, so example
 ## Learning path
 
 ### 1. Start with a complete workflow
+
+**Status: runnable.**
 
 Begin with a small end-to-end analysis to see how the pieces fit together before exploring them individually.
 
@@ -45,6 +56,9 @@ It also introduces the logical graph, execution plan, and artifacts that Flow pr
 
 ### 2. Read data
 
+**Status: runnable.** Remote-data lessons require network access for the input
+files.
+
 Learn how FAST-HEP introduces data into a workflow.
 
 Topics include:
@@ -61,6 +75,8 @@ This section establishes the data sources and event streams used by the rest of 
 
 ### 3. Transform data
 
+**Status: runnable.**
+
 Build the scientific content of the analysis.
 
 Topics include:
@@ -75,6 +91,8 @@ These tutorials show how operations enrich and transform event streams while Flo
 ---
 
 ### 4. Summarise and visualise
+
+**Status: runnable. This completes the first small analysis.**
 
 Turn processed event data into analysis products.
 
@@ -91,6 +109,8 @@ The tutorials also expose selected generated artifacts, making it possible to se
 
 ### 5. Save derived data
 
+**Status: runnable.**
+
 Learn how workflows can produce reusable datasets as well as final plots and summaries.
 
 Topics include:
@@ -106,6 +126,9 @@ This is particularly useful for workflows where one processing stage produces re
 
 ### 6. Build realistic workflows
 
+**Status: runnable for the current systematics and workflow-organisation
+lessons.**
+
 Once the basic operations are familiar, the workshop introduces features needed by larger analyses:
 
 - systematic variations
@@ -119,13 +142,18 @@ These sections focus on keeping increasingly complex analyses understandable and
 
 ### 7. Scale and specialise execution
 
+**Status: partly runnable and infrastructure-dependent.**
+
 The later tutorials explore how the same workflow model can be used with different execution capabilities.
 
-Planned and developing topics include:
+Current material includes local Dask and Dask-to-HTCondor execution. The
+HTCondor path requires a configured site environment; it has been exercised
+successfully through Flow at CERN lxplus.
 
-- local and distributed execution
-- Dask and batch-provisioned workers
+Developing topics include:
+
 - accelerators and GPUs
+- Slurm provisioning through a future Flow route
 - execution diagnostics
 - execution modifiers and specialised runtime behaviour
 
@@ -135,16 +163,21 @@ These parts of the workshop are evolving alongside the corresponding FAST-HEP im
 
 ### 8. Extend FAST-HEP
 
+**Status: planned as a step-by-step Workshop section.**
+
 FAST-HEP is designed around replaceable capabilities.
 
-The extension tutorials show how projects and analyses can provide their own:
+The planned extension tutorials will show how projects and analyses can provide their own:
 
 * operations
 * profiles and registries
 * data sources
 * compiler and runtime extensions
 
-using the same interfaces as the standard FAST-HEP packages.
+using the same interfaces as the standard FAST-HEP packages. Until those
+lessons are complete, the
+[Flow extension documentation](https://fasthep-flow.readthedocs.io/en/latest/extending/index.html)
+is the authoritative guide to the available seams.
 
 This is the recommended route for experiment-specific and analysis-specific functionality.
 
@@ -152,7 +185,12 @@ This is the recommended route for experiment-specific and analysis-specific func
 
 ### 9. Put everything together
 
-These examples show how the individual concepts combine into a realistic, composable FAST-HEP workflow.
+**Status: the learning path already produces a small end-to-end analysis;
+larger complete case studies are planned.**
+
+The existing tutorials combine the core concepts into a working analysis.
+Future complete examples will show how the same pieces scale into larger,
+domain-specific repositories without replacing the focused lessons.
 
 ```mermaid
 flowchart TD
@@ -185,8 +223,9 @@ The workshop is the best place to learn FAST-HEP by doing; these project-level d
 ---
 
 {{< admonition note >}}
-The workshop is being updated alongside the current FAST-HEP rewrite. Early
-tutorials are runnable now, while advanced sections on distributed execution,
-accelerators, and extensions are being completed as those interfaces
-stabilise.
+The workshop is being updated alongside the current FAST-HEP rewrite. The core
+path through a small complete analysis is runnable, as are several later
+lessons on saved data, systematics, and workflow organisation. Distributed
+lessons depend on the available infrastructure. Accelerator, custom-extension,
+and larger complete case-study sections are still being developed.
 {{< /admonition >}}
