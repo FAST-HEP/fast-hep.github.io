@@ -14,7 +14,3 @@ the documentation sites are unified — for now, see each package's `CHANGELOG.m
 * [`fasthep-toolbench`](https://github.com/FAST-HEP/fasthep-toolbench/blob/main/CHANGELOG.md) — shared utilities
 * [`fasthep-distributed`](https://github.com/FAST-HEP/fasthep-distributed/blob/main/CHANGELOG.md) — distributed execution
 * [`fasthep-workshop`](https://github.com/FAST-HEP/fasthep-workshop/blob/main/CHANGELOG.md) — examples and tutorials
-
-`fasthep-distributed` is included here even though it does not yet have its own section on the
-[Packages](/packages/) page — that page predates `distributed` joining the release set, and updating
-it is a separate, larger content task outside this plan.
