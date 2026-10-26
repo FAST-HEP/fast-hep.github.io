@@ -99,6 +99,10 @@ icon = "discourse"
   text = "Tutorials"
   link = "/tutorials/"
 
+  [[params.footer.quicklinks.column2.links]]
+  text = "Changelogs"
+  link = "/changelogs/"
+
   [params.footer.quicklinks.column3]
   title = "Resources"
 
