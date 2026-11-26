@@ -80,6 +80,8 @@ produced.
 
 For the artifact boundary and lifecycle, see the
 [Flow artifact documentation](https://fasthep-flow.readthedocs.io/en/latest/execution/artifacts.html).
+For saving a product and restoring it in another process with its provenance, see the
+[Flow product persistence schema](https://fasthep-flow.readthedocs.io/en/latest/execution/persistence.html).
 
 ## Related concepts
 
